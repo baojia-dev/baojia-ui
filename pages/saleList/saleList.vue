@@ -5,15 +5,15 @@
 			<view v-if="list.length" class="list-wrap">
 				<view class="item-wrap" v-for="(item,index) in list" :key="index">
 					<view class="item-left">
-						<text class="item-name">{{item.model}}</text>
+						<text class="item-name">{{ item.model }}</text>
 						<view class="item-info">
-							<text style="margin-right: 10rpx;">{{item.color}}</text>
+							<text style="margin-right: 10rpx;">{{ item.color}}</text>
 							<text>{{ item.version }}</text>
 						</view>
-						<text class="item-date">交易时间：{{ item.time | formatDate }}</text>
+						<text class="item-date">交易时间：{{ item.create_time }}</text>
 					</view>
 					<view class="item-right">
-						<text class="item-stat">{{ item.stat}}</text>
+						<text class="item-stat">{{ item.status }}</text>
 						<view class="item-price-wrap">
 							<text>成交价：</text>
 							<text class="item-price">¥ {{ item.prices }}</text>
@@ -25,7 +25,7 @@
 		</scroll-view>
 
 		<movable-area>
-			<movable-view  direction="all" y="100" @click="godown">立即出货</movable-view>
+			<movable-view direction="all" y="100" @click="godown">立即出货</movable-view>
 		</movable-area>
 	</view>
 </template>
@@ -35,39 +35,23 @@
 	export default {
 		data() {
 			return {
-				list: [{
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, {
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, {
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, ],
+				list: [],
 			}
 		},
 		onLoad() {},
 		mounted() {
-
+			this.getSales()
 		},
 		methods: {
 			// 立即出货
-			godown(){
+			godown() {
 				uni.navigateTo({
-					url:'/pages/sale/sale'
+					url: '/pages/sale/sale'
+				})
+			},
+			getSales() {
+				api.getSales().then(res => {
+					this.list = res.data
 				})
 			}
 		},
@@ -88,14 +72,15 @@
 	page {
 		background-color: #f2f2f2;
 	}
-	
-	movable-area{
+
+	movable-area {
 		width: 160rpx;
 		height: 400rpx;
 		position: absolute;
 		right: 30rpx;
 		bottom: 30rpx;
 	}
+
 	movable-view {
 		width: 160rpx;
 		height: 160rpx;
