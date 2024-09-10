@@ -4,6 +4,11 @@
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "报价"
+			}
+		},{
 		    "path" : "pages/login/login",
 		    "style" :                                                                                    
 		    {
@@ -13,9 +18,9 @@
 		    }
 		    
 		},{
-			"path": "pages/index/index",
+			"path": "pages/saleList/saleList",
 			"style": {
-				"navigationBarTitleText": "报价"
+				"navigationBarTitleText": "出货"
 			}
 		},{
 			"path": "pages/sale/sale",
@@ -57,7 +62,7 @@
 	        "selectedIconPath": "static/img/index-selected.png",
 	        "text": "报价"
 	    },{
-	        "pagePath": "pages/sale/sale",
+	        "pagePath": "pages/saleList/saleList",
 	        "iconPath": "static/img/index.png",
 	        "selectedIconPath": "static/img/index-selected.png",
 	        "text": "出货"

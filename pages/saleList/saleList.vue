@@ -1,15 +1,8 @@
 <template>
-	<!-- 首页 -->
+	<!-- 出货列表 -->
 	<view class="content">
-		<u-tabs class="tab" :list="tabs" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
 		<scroll-view scroll-y="true" class="scroll-Y">
 			<view v-if="list.length" class="list-wrap">
-				<view class="brand-tags">
-					<view class="brand-item" v-for="(item, index) in brands" :key="index">
-						<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" :name="index"
-							@click="handleBrandClick(item.brand)"></u-tag>
-					</view>
-				</view>
 				<view class="item-wrap" v-for="(item,index) in list" :key="index">
 					<view class="item-left">
 						<text class="item-name">{{item.model}}</text>
@@ -17,15 +10,23 @@
 							<text style="margin-right: 10rpx;">{{item.color}}</text>
 							<text>{{ item.version }}</text>
 						</view>
+						<text class="item-date">交易时间：{{ item.time | formatDate }}</text>
 					</view>
 					<view class="item-right">
-						<text class="item-date">{{ (item.prices && item.prices[0].created_at) | formatDate }}</text>
-						<text class="item-price">¥ {{ item.prices && item.prices[0].in_price }}</text>
+						<text class="item-stat">{{ item.stat}}</text>
+						<view class="item-price-wrap">
+							<text>成交价：</text>
+							<text class="item-price">¥ {{ item.prices }}</text>
+						</view>
 					</view>
 				</view>
 			</view>
 			<u-empty v-else></u-empty>
 		</scroll-view>
+
+		<movable-area>
+			<movable-view  direction="all" y="100" @click="godown">立即出货</movable-view>
+		</movable-area>
 	</view>
 </template>
 
@@ -34,50 +35,41 @@
 	export default {
 		data() {
 			return {
-				tabs: [{
-					name: '手机'
+				list: [{
+					model: 'iphone 15 pro max',
+					color: '黑色',
+					version: '256G',
+					time: '2024-10-20',
+					prices: 2098,
+					stat: '已成交'
 				}, {
-					name: '平板'
+					model: 'iphone 15 pro max',
+					color: '黑色',
+					version: '256G',
+					time: '2024-10-20',
+					prices: 2098,
+					stat: '已成交'
 				}, {
-					name: '耳机'
-				}],
-				currentType: 0,
-				currentBrand: '苹果',
-				list: [],
-				brands: [{
-						brand: '苹果',
-						checked: true
-					},
-					{
-						brand: '华为',
-						checked: false
-					},
-				]
+					model: 'iphone 15 pro max',
+					color: '黑色',
+					version: '256G',
+					time: '2024-10-20',
+					prices: 2098,
+					stat: '已成交'
+				}, ],
 			}
 		},
 		onLoad() {},
 		mounted() {
-			this.getProducts()
+
 		},
 		methods: {
-			handleBrandClick(brand) {
-				this.brands.map((item) => {
-					item.checked = item.brand === brand ? true : false
+			// 立即出货
+			godown(){
+				uni.navigateTo({
+					url:'/pages/sale/sale'
 				})
-				this.currentBrand = brand;
-				this.getProducts()
-			},
-			change(index) {
-				this.currentType = index;
-				console.log("切换", this.currentType)
-				this.getProducts()
-			},
-			getProducts() {
-				const type = this.currentType + 1
-				api.getProducts(type, this.currentBrand).then(res => {
-					this.list = res.data
-				})
-			},
+			}
 		},
 		filters: {
 			// 2024-10-10 => 10-10
@@ -95,6 +87,25 @@
 <style lang="scss" scoped>
 	page {
 		background-color: #f2f2f2;
+	}
+	
+	movable-area{
+		width: 160rpx;
+		height: 400rpx;
+		position: absolute;
+		right: 30rpx;
+		bottom: 30rpx;
+	}
+	movable-view {
+		width: 160rpx;
+		height: 160rpx;
+		color: #fff;
+		font-size: 28rpx;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: $u-type-primary;
 	}
 
 	.content {
@@ -118,7 +129,7 @@
 	}
 
 	.item-wrap {
-		height: 120rpx;
+		height: 160rpx;
 		margin-bottom: 20rpx;
 		background-color: #fff;
 		display: flex;
@@ -142,33 +153,42 @@
 		font-weight: 600;
 	}
 
-	.item-info {
+	.item-info,
+	.item-date {
 		color: #999;
 		font-size: 24rpx;
 		line-height: 24rpx;
 	}
 
 	.item-right {
+		width: 300rpx;
 		height: 100%;
 		// position: relative;
 		display: flex;
-		justify-content: center;
+		flex-direction: column;
+		justify-content: space-around;
 		align-items: center;
-		padding: 0rpx 15rpx;
+		padding: 15rpx;
 	}
 
-	.item-date {
+	.item-stat {
 		padding: 2rpx 10rpx;
 		color: #FA3534;
 		background-color: #fef0f0;
 		font-size: 28rpx;
-		margin-right: 40rpx;
+	}
+
+	.item-price-wrap {
+		font-size: 30rpx;
+		line-height: 30rpx;
+		color: #626262;
 	}
 
 	.item-price {
-		width: 150rpx;
+		width: 100%;
 		color: $u-type-primary;
 		font-size: 38rpx;
+		line-height: 38rpx;
 	}
 
 	.brand-item {

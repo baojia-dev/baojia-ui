@@ -70,8 +70,9 @@
 					}],
 					password: [{
 						required: true,
-						pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
-						message: '密码必须包含至少6位数字和字母的组合',
+						// pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{3,}$/,
+						min: 3,
+						message: '密码不能少于3位',
 						trigger: ['change', 'blur'],
 					}],
 					againPassword: [{
@@ -132,14 +133,16 @@
 						this.loginLoading = true
 						try {
 							const res = await api.login(this.loginForm.username, this.loginForm.password)
-							console.log(res)
+							uni.setStorageSync("token", res.data);
 							this.showToast("登录成功", "success");
-							uni.switchTab({
-								url: "/pages/index/index",
-							})
+							setTimeout(() => {
+								uni.switchTab({
+									url: '/pages/index/index'
+								})
+							}, 1000)
 						} catch (err) {
-							console.log(err)
-							this.showToast("登录失败" + err.message, "error");
+							console.log(111,err)
+							this.showToast("登录失败" + err, "error");
 						} finally {
 							this.loginLoading = false
 						}

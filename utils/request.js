@@ -6,7 +6,7 @@ let request = (http) => {
 		data,
 		method
 	} = http
-	const token = uni.getStorageSync('loginSysUser') ? JSON.parse(uni.getStorageSync('loginSysUser')).token : ''
+	const token = uni.getStorageSync('token')
 	return new Promise((resolve, reject) => {
 		uni.request({
 			url: baseUrl + url,
@@ -14,24 +14,27 @@ let request = (http) => {
 			data,
 			header: {
 				"Content-Type": "application/json",
+				'Authorization': token
 			},
-			withCredentials: true,
+			// withCredentials: true,
 			success: (res) => { //请求成功
-				if (res.data.code === 0) { //这里后台返回一个自定义状态码，可根据实际开发情况调整
+				if (res.statusCode === 200 && res.data.code === 0) { //这里后台返回一个自定义状态码，可根据实际开发情况调整
 					resolve(res.data)
 				} else {
 					if (res.data.code == 401) {
-						uni.removeStorageSync('loginSysUser')
+						// uni.removeStorageSync('token')
 						uni.navigateTo({
 							url: '/pages/login/login'
 						})
+						reject()
+					} else {
+						uni.showToast({
+							title: res.data.msg || '请求数据失败',
+							icon: 'none',
+							duration: 2000
+						})
+						reject(res.data.msg)
 					}
-					uni.showToast({
-						title: res.data.message || '请求数据失败',
-						icon: 'none',
-						duration: 2000
-					})
-					resolve(res.data)
 				}
 			},
 			fail: (err) => { //请求失败
