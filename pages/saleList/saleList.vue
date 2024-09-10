@@ -2,22 +2,23 @@
 	<!-- 出货列表 -->
 	<view>
 		<view class="content" v-if="isLogin">
+			<u-tabs class="tab" :list="tabs" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
 			<scroll-view scroll-y="true" class="scroll-Y">
 				<view v-if="list.length" class="list-wrap">
 					<view class="item-wrap" v-for="(item,index) in list" :key="index" @click="detail(item)">
 						<view class="item-left">
-							<text class="item-name">{{item.model}}</text>
+							<text class="item-name">{{item.product.model}}</text>
 							<view class="item-info">
-								<text style="margin-right: 10rpx;">{{item.color}}</text>
-								<text>{{ item.version }}</text>
+								<text style="margin-right: 10rpx;">{{item.product.color}}</text>
+								<text>{{ item.product.version }}</text>
 							</view>
-							<text class="item-date">交易时间：{{ item.time | formatDate }}</text>
+							<text class="item-date">期望取货时间：{{ item.receive_time }}</text>
 						</view>
 						<view class="item-right">
-							<text class="item-stat">{{ item.status }}</text>
-							<view class="item-price-wrap">
+							<text :class="item.status === 0 ? 'item-stat-red' : 'item-stat-green'" >{{ item.status | formatStatus }}</text>
+							<view class="item-price-wrap" v-show="item.status === 1">
 								<text>成交价：</text>
-								<text class="item-price">¥ {{ item.prices }}</text>
+								<text class="item-price">¥ {{ item.price }}</text>
 							</view>
 						</view>
 					</view>
@@ -26,7 +27,7 @@
 			</scroll-view>
 
 			<movable-area>
-				<movable-view direction="all" y="100" @click="godown">立即出货</movable-view>
+				<movable-view direction="all" y="120" @click="godown">出货</movable-view>
 			</movable-area>
 		</view>
 
@@ -44,9 +45,13 @@
 			return {
 				isLogin: true,
 				list: [],
+				tabs: [{ name: '待收货' },{ name: '已收货' }],
+				currentType: 0,
 			}
 		},
-		onLoad() {},
+		onShow() {
+			this.getSales()
+		},
 		mounted() {
 			this.isLogin = uni.getStorageSync('token')
 			this.getSales()
@@ -54,19 +59,31 @@
 		methods: {
 			// 去登录
 			toLogin() {
-				uni.reLaunch({ url: '/pages/login/login' })
+				uni.reLaunch({
+					url: '/pages/login/login'
+				})
 			},
 			// 立即出货
 			godown() {
-				uni.navigateTo({ url: '/pages/sale/sale?type=1' })
+				uni.navigateTo({
+					url: '/pages/sale/sale?type=1'
+				})
+			},
+			change(index) {
+				this.currentType = index
+				this.getSales()
 			},
 			// 查看详情
-			detail({ id }) {
+			detail({
+				id
+			}) {
 				console.log('查看详情', id)
-				uni.navigateTo({ url: `/pages/sale/sale?id=${id}&type=1` })
+				uni.navigateTo({
+					url: `/pages/saleDetail/saleDetail?id=${id}&type=1`
+				})
 			},
 			getSales() {
-				api.getSales().then(res => {
+				api.getSales(this.currentType).then(res => {
 					this.list = res.data
 					console.log('获取出货列表', this.list)
 				})
@@ -75,13 +92,19 @@
 		filters: {
 			// 2024-10-10 => 10-10
 			formatDate(value) {
-				const date = new Date(value)
+				const date = new Date(value.replace(/\-/g, "/"))
 				const year = date.getFullYear()
 				const month = date.getMonth() + 1
 				const day = date.getDate()
 				return `${month}-${day}`
 			},
-
+			formatStatus(value) {
+				const statusMap = {
+					0: '待收货',
+					1: '已收货'
+				}
+				return statusMap[value]
+			}
 		}
 	}
 </script>
@@ -95,13 +118,13 @@
 		width: 160rpx;
 		height: 400rpx;
 		position: absolute;
-		right: 30rpx;
-		bottom: 30rpx;
+		right: 0rpx;
+		bottom: 0rpx;
 	}
 
 	movable-view {
-		width: 160rpx;
-		height: 160rpx;
+		width: 100rpx;
+		height: 100rpx;
 		color: #fff;
 		font-size: 28rpx;
 		border-radius: 50%;
@@ -182,10 +205,17 @@
 		padding: 15rpx;
 	}
 
-	.item-stat {
+	.item-stat-red {
 		padding: 2rpx 10rpx;
 		color: #FA3534;
 		background-color: #fef0f0;
+		font-size: 28rpx;
+	}
+	
+	.item-stat-green {
+		padding: 2rpx 10rpx;
+		color: #0BB20C;
+		background-color: #f0f8ef;
 		font-size: 28rpx;
 	}
 

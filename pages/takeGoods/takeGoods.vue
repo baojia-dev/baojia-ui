@@ -6,16 +6,16 @@
 			<view v-if="list.length" class="list-wrap">
 				<view class="item-wrap" v-for="(item,index) in list" :key="index" @click="detail(item)">
 					<view class="item-left">
-						<text class="item-name">{{item.model}}</text>
+						<text class="item-name">{{item.product.model}}</text>
 						<view class="item-info">
-							<text style="margin-right: 10rpx;">{{item.color}}</text>
-							<text>{{ item.version }}</text>
+							<text style="margin-right: 10rpx;">{{item.product.color}}</text>
+							<text>{{ item.product.version }}</text>
 						</view>
-						<text class="item-date">交易时间：{{ item.time | formatDate }}</text>
+						<text class="item-date">期望收货时间：{{ item.receive_time }}</text>
 					</view>
 					<view class="item-right">
-						<text class="item-stat">{{ item.stat}}</text>
-						<view class="item-price-wrap">
+						<text :class="item.status === 0 ? 'item-stat-red' : 'item-stat-green'" >{{ item.status | formatStatus }}</text>
+						<view class="item-price-wrap" v-show="item.status === 1">
 							<text>成交价：</text>
 							<text class="item-price">¥ {{ item.prices }}</text>
 						</view>
@@ -32,60 +32,51 @@
 	export default {
 		data() {
 			return {
-				tabs: [{ name: '已收货' }, { name: '待收货' }],
+				tabs: [{ name: '待收货' },{ name: '已收货' }],
 				currentType: 0,
-				list: [{
-					id: 1,
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, {
-					id: 2,
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, {
-					id: 3,
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, ],
+				list: [],
 			}
 		},
 		onLoad() {},
+		onShow() {
+			this.getSales()
+		},
 		mounted() {
-
+			this.getSales()
 		},
 		methods: {
 			// 查看详情
 			detail({ id }) {
 				console.log('查看详情', id)
-				uni.navigateTo({ url: `/pages/sale/sale?id=${id}&type=2` })
+				uni.navigateTo({ url: `/pages/saleDetail/saleDetail?id=${id}&type=2` })
 			},
 			change(index) {
 				this.currentType = index
-
+				this.getSales()
+			},
+			getSales() {
+				api.getSales(this.currentType).then(res => {
+					this.list = res.data
+					console.log('获取出货列表', this.list)
+				})
 			}
 		},
 		filters: {
 			// 2024-10-10 => 10-10
 			formatDate(value) {
-				const date = new Date(value)
+				const date = new Date(value.replace(/\-/g, "/"))
 				const year = date.getFullYear()
 				const month = date.getMonth() + 1
 				const day = date.getDate()
 				return `${month}-${day}`
 			},
-
+			formatStatus(value) {
+				const statusMap = {
+					0: '待收货',
+					1: '已收货'
+				}
+				return statusMap[value]
+			}
 		}
 	}
 </script>
@@ -178,10 +169,17 @@
 		padding: 15rpx;
 	}
 
-	.item-stat {
+	.item-stat-red {
 		padding: 2rpx 10rpx;
 		color: #FA3534;
 		background-color: #fef0f0;
+		font-size: 28rpx;
+	}
+	
+	.item-stat-green {
+		padding: 2rpx 10rpx;
+		color: #0BB20C;
+		background-color: #f0f8ef;
 		font-size: 28rpx;
 	}
 

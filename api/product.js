@@ -23,9 +23,24 @@ export const createSale = (data) => {
 	})
 }
 
-export const getSales = () => {
+export const getSales = (status) => {
 	return request({
-		url: `/sales`,
+		url: `/sales?status=${status}`,
 		method: 'GET',
+	})
+}
+
+export const getSale = (id) => {
+	return request({
+		url: `/sale/${id}`,
+		method: 'GET',
+	})
+}
+
+export const confirmSale = (data) => {
+	return request({
+		url: `/sale/confirm`,
+		method: 'PUT',
+		data,
 	})
 }

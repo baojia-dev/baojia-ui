@@ -2,14 +2,14 @@
 	<!-- 首页 -->
 	<view class="content">
 		<u-tabs class="tab" :list="tabs" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
+		<view class="brand-tags">
+			<view class="brand-item" v-for="(item, index) in brands" :key="index">
+				<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" :name="index"
+					@click="handleBrandClick(item.brand)"></u-tag>
+			</view>
+		</view>
 		<scroll-view scroll-y="true" class="scroll-Y">
 			<view v-if="list.length" class="list-wrap">
-				<view class="brand-tags">
-					<view class="brand-item" v-for="(item, index) in brands" :key="index">
-						<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" :name="index"
-							@click="handleBrandClick(item.brand)"></u-tag>
-					</view>
-				</view>
 				<view class="item-wrap" v-for="(item,index) in list" :key="index">
 					<view class="item-left">
 						<text class="item-name">{{item.model}}</text>
@@ -82,7 +82,7 @@
 		filters: {
 			// 2024-10-10 => 10-10
 			formatDate(value) {
-				const date = new Date(value)
+				const date = new Date(value.replace(/\-/g, "/"))
 				const year = date.getFullYear()
 				const month = date.getMonth() + 1
 				const day = date.getDate()
@@ -172,13 +172,14 @@
 	}
 
 	.brand-item {
-		margin-right: 40rpx;
+		margin-right: 20rpx;
 	}
 
 	.brand-tags {
 		display: flex;
 		width: 100%;
 		height: 100%;
-		margin-bottom: 20rpx;
+		margin-top: 20rpx;
+		padding: 0 20rpx;
 	}
 </style>

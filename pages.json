@@ -47,6 +47,13 @@
 				"navigationBarTitleText" : "",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/saleDetail/saleDetail",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
 		}
 
 	],

@@ -1,24 +1,26 @@
 <template>
 	<view class="wrap">
 		<u-form :model="model" :rules="rules" ref="uForm" :errorType="['message']">
-			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="联系方式" prop="contact" label-width="150">
+			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="联系方式" prop="contact"
+				label-width="150">
 				<u-input :border="false" placeholder="请输入手机号或微信号" v-model="model.contact" type="text"
 					:disabled="disabled"></u-input>
 			</u-form-item>
 			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="序列号" prop="sn" label-width="150">
-				<u-input :border="false" placeholder="请输入序列号" v-model="model.sn" type="text" :disabled="disabled"></u-input>
+				<u-input :border="false" placeholder="请输入序列号" v-model="model.sn" type="text"
+					:disabled="disabled"></u-input>
 			</u-form-item>
 			<u-form-item label="取货地址" prop="address" label-width="150">
 				<u-input type="text" :border="false" placeholder="请填写取货地址(地铁站点)" v-model="model.address"
 					:disabled="disabled"></u-input>
 			</u-form-item>
-			<u-form-item label="取货时间" prop="create_time" label-width="180">
+			<u-form-item label="取货时间" prop="receive_time" label-width="180">
 				<u-input :border="false" type="select" :select-open="pickerShow" placeholder="请选择取货时间"
-					v-model="model.create_time" @click="pickerShow = true" :disabled="disabled"></u-input>
+					v-model="model.receive_time" @click="pickerShow = true" :disabled="disabled"></u-input>
 			</u-form-item>
 			<u-form-item label="商品类型" prop="type" label-width="150">
-				<u-radio-group v-model="radio" @change="radioGroupChange" :width="radioCheckWidth" :wrap="radioCheckWrap"
-					:disabled="disabled">
+				<u-radio-group v-model="radio" @change="radioGroupChange" :width="radioCheckWidth"
+					:wrap="radioCheckWrap" :disabled="disabled">
 					<u-radio shape="circle" v-for="(item, index) in radioList" :key="index" :name="item.name">
 						{{ item.name }}
 					</u-radio>
@@ -52,14 +54,7 @@
 					@on-success="pkg_back_imgUploadSuccess"> </u-upload>
 			</u-form-item>
 		</u-form>
-		<u-button v-if="pageType === 1 && !disabled" @click="submit" type="primary">提交</u-button>
-		<view v-else-if="pageType === 2" class="btn-wrap">
-			<view class="final-price">
-				<u-input style="width: 200rpx" :border="true" placeholder="成交价" v-model="finalPrice" type="text"></u-input>
-			</view>
-			<u-button style="width: 400rpx" @click="confirmTake" type="primary">确认收货</u-button>
-		</view>
-
+		<u-button @click="submit" type="primary">提交</u-button>
 		<u-picker mode="time" v-model="pickerShow" :params="params" :defaultTime="defaultTime"
 			@confirm="timeConfirm"></u-picker>
 		<u-select mode="single-column" :list="products" v-model="selectShow" @confirm="selectConfirm"></u-select>
@@ -72,15 +67,14 @@
 		data() {
 			let that = this
 			return {
-				action: process.env.NODE_ENV === 'development' ? 'http://localhost:8080/api/upload' :
-					'https://bj.xbmlz.cc/api/upload',
+				action: uni.getStorageSync('baseUrl') + "/upload",
 				model: {
 					contact: '', // 联系方式
 					sn: '', // 序列号
 					remark: '', // 备注
 					type: '手机', // 商品类型
 					product_id: '', // 产品型号
-					create_time: '', // 期望交易时间
+					receive_time: '', // 期望交易时间
 					order_img: '', // 订单截图
 					pkg_front_img: '', // 包装正面照片
 					pkg_back_img: '', // 包装背面照片
@@ -167,17 +161,16 @@
 					timestamp: true
 				},
 				currentModel: 0,
-				pageType: 1, // 1：出货 2:收货
-				finalPrice: null, // 成交价格
 			}
 		},
 		onLoad(options) {
-			if (options.id) {
-				// 根据出货id获取出货详情
-				this.getSaleInfo(options.id)
-			}
-			this.pageType = +options.type
-			console.log('收货？出货', options)
+			// this.getProducts()
+			// if (options.id) {
+			// 	// 根据出货id获取出货详情
+			// 	this.getSaleInfo(options.id)
+			// }
+			// this.pageType = +options.type
+			// console.log('收货？出货', options)
 		},
 		mounted() {
 			this.getProducts()
@@ -202,6 +195,9 @@
 							if (res.code === 0) {
 								this.$u.toast('提交成功')
 								// this.model = {}
+								uni.navigateBack({
+									delta: 1
+								})
 							} else {
 								this.$u.toast(res.msg)
 							}
@@ -263,7 +259,7 @@
 					day,
 					hour
 				} = e
-				this.model.create_time = `${year}-${month}-${day} ${hour}`
+				this.model.receive_time = `${year}-${month}-${day} ${hour}`
 			},
 			// 获取产品列表
 			getProducts() {
@@ -271,22 +267,13 @@
 				api.getProducts(type, this.brand).then(res => {
 					this.products = res.data.map(item => {
 						return {
-							label: item.model,
+							label: `${item.model}-${item.color}-${item.version}`,
 							value: item.id
 						}
 					})
 				})
 			},
-			// 获取出货详情
-			getSaleInfo(id) {
-				// TODO: 获取出货详情
-				this.disabled = true
-			},
-			// 确认收货
-			confirmTake() {
-				console.log('确认shouhuo1', this.finalPrice)
-				if (!this.finalPrice) return this.$u.toast('请填写成交价')
-			}
+			
 		}
 	}
 </script>

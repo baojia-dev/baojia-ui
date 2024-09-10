@@ -19,13 +19,13 @@
 			<u-cell-group>
 				<u-cell-item v-if="userInfo.is_admin" icon="order" title="价格维护" @click="toPrice"></u-cell-item>
 				<u-cell-item v-if="userInfo.is_admin" icon="bell" title="收货列表" @click="toSale"></u-cell-item>
-				<u-cell-item icon="kefu-ermai" title="联系我们"></u-cell-item>
+				<!-- <u-cell-item icon="kefu-ermai" title="联系我们"></u-cell-item> -->
 			</u-cell-group>
 		</view>
 
 		<view class="u-m-t-20">
 			<u-cell-group>
-				<u-cell-item icon="setting" title="设置"></u-cell-item>
+				<u-cell-item icon="zhuanfa" title="退出登录"></u-cell-item>
 			</u-cell-group>
 		</view>
 	</view>
