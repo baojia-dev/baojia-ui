@@ -1,6 +1,6 @@
 <template>
 	<!-- 出货列表 -->
-	<view class="">
+	<view>
 		<view class="content" v-if="isLogin">
 			<scroll-view scroll-y="true" class="scroll-Y">
 				<view v-if="list.length" class="list-wrap">
@@ -14,7 +14,7 @@
 							<text class="item-date">交易时间：{{ item.time | formatDate }}</text>
 						</view>
 						<view class="item-right">
-							<text class="item-stat">{{ item.stat}}</text>
+							<text class="item-stat">{{ item.status }}</text>
 							<view class="item-price-wrap">
 								<text>成交价：</text>
 								<text class="item-price">¥ {{ item.prices }}</text>
@@ -43,36 +43,13 @@
 		data() {
 			return {
 				isLogin: true,
-				list: [{
-					id: 1,
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, {
-					id: 2,
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, {
-					id: 3,
-					model: 'iphone 15 pro max',
-					color: '黑色',
-					version: '256G',
-					time: '2024-10-20',
-					prices: 2098,
-					stat: '已成交'
-				}, ],
+				list: [],
 			}
 		},
 		onLoad() {},
 		mounted() {
 			this.isLogin = uni.getStorageSync('token')
+			this.getSales()
 		},
 		methods: {
 			// 去登录
@@ -87,6 +64,12 @@
 			detail({ id }) {
 				console.log('查看详情', id)
 				uni.navigateTo({ url: `/pages/sale/sale?id=${id}&type=1` })
+			},
+			getSales() {
+				api.getSales().then(res => {
+					this.list = res.data
+					console.log('获取出货列表', this.list)
+				})
 			}
 		},
 		filters: {

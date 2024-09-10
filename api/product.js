@@ -22,3 +22,10 @@ export const createSale = (data) => {
 		data,
 	})
 }
+
+export const getSales = () => {
+	return request({
+		url: `/sales`,
+		method: 'GET',
+	})
+}
