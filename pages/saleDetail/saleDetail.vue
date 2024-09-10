@@ -37,6 +37,15 @@
 				<u-image style="float: right;" width="200rpx" height="200rpx"
 					:src="ossUrl + saleInfo.pkg_back_img"></u-image>
 			</u-cell-item>
+			<u-cell-item v-show="saleInfo.status === 1" title="成交价" :arrow="false">
+				{{ saleInfo.price }}
+			</u-cell-item>
+			<u-cell-item v-show="saleInfo.status === 1" title="结算方式" :arrow="false">
+				{{ saleInfo.payment | formatPayment }}
+			</u-cell-item>
+			<u-cell-item v-show="saleInfo.status === 1" title="成交时间" :arrow="false">
+				{{ saleInfo.update_time | formatDatetime }}
+			</u-cell-item>
 		</u-cell-group>
 
 		<u-button v-if="pageType === 2 && saleInfo.status === 0" @click="confirmShow = true"
@@ -144,6 +153,26 @@
 						})
 					}, 1000)
 				})
+			}
+		},
+		filters: {
+			formatPayment(value) {
+				const paymentMap = {
+					1: '微信',
+					2: '支付宝',
+					3: '银行卡'
+				}
+				return paymentMap[value]
+			},
+			formatDatetime(value) {
+				const date = new Date()
+				const year = date.getFullYear()
+				const month = date.getMonth() + 1
+				const day = date.getDate()
+				const hour = date.getHours()
+				const minute = date.getMinutes()
+				const second = date.getSeconds()
+				return `${year}-${month}-${day} ${hour}:${minute}:${second}`
 			}
 		}
 	}

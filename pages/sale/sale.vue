@@ -195,9 +195,11 @@
 							if (res.code === 0) {
 								this.$u.toast('提交成功')
 								// this.model = {}
-								uni.navigateBack({
-									delta: 1
-								})
+								setTimeout(() => {
+									uni.navigateBack({
+										delta: 1
+									})
+								}, 1000)
 							} else {
 								this.$u.toast(res.msg)
 							}

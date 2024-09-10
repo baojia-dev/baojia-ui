@@ -27,13 +27,13 @@
 							<view class="input-label">出货价：</view>
 							<u-input v-model="getNewestPrice(item).out_price" type="text" :border="true"
 								border-color="#2979ff" height="60" :custom-style="inputStyle" placeholder=''
-								@blur="handleOutPrice($event, item)" @confirm="handleOutPrice($event, item)" />
+								@blur="handleOutPrice($event, item)" />
 						</view>
 						<view class="input-wrap">
 							<view class="input-label">利润：</view>
 							<u-input v-model="getNewestPrice(item).profit" type="text" :border="true"
 								border-color="#2979ff" height="60" :custom-style="inputStyle" placeholder=''
-								@blur="handleNewestPrice($event, item)" @confirm="handleNewestPrice($event, item)" />
+								@blur="handleNewestPrice($event, item)" />
 						</view>
 						<view class="input-wrap">
 							<view class="input-label">收货价：</view>
@@ -95,14 +95,14 @@
 				this.getProducts()
 			},
 			handleOutPrice(v, item) {
-				console.log(v, item)
+				console.log('handleOutPrice', v, item)
 				const profit = this.getNewestPrice(item).profit
 				const update = {
 					product_id: item.id,
 					out_price: parseFloat(v),
 					profit: profit,
 					// 收货价 = 出货价 - 利润
-					in_price: parseFloat(v) - parseFloat(profit),
+					// in_price: parseFloat(v) - parseFloat(profit),
 					created_at: this.getTodayDate()
 				}
 				api.updatePrice(update).then(res => {
@@ -111,14 +111,14 @@
 				})
 			},
 			handleNewestPrice(v, item) {
-				console.log(v, item)
+				console.log('handleNewestPrice', v, item)
 				const out_price = this.getNewestPrice(item).out_price
 				const update = {
 					product_id: item.id,
-					out_price: out_price,
+					out_price: parseFloat(out_price),
 					profit: parseFloat(v),
 					// 收货价 = 出货价 - 利润
-					in_price: parseFloat(out_price) - parseFloat(v),
+					// in_price: parseFloat(out_price) - parseFloat(v),
 					created_at: this.getTodayDate()
 				}
 				api.updatePrice(update).then(res => {
