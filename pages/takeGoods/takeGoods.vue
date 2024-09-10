@@ -1,40 +1,30 @@
 <template>
 	<!-- 出货列表 -->
-	<view class="">
-		<view class="content" v-if="isLogin">
-			<scroll-view scroll-y="true" class="scroll-Y">
-				<view v-if="list.length" class="list-wrap">
-					<view class="item-wrap" v-for="(item,index) in list" :key="index" @click="detail(item)">
-						<view class="item-left">
-							<text class="item-name">{{item.model}}</text>
-							<view class="item-info">
-								<text style="margin-right: 10rpx;">{{item.color}}</text>
-								<text>{{ item.version }}</text>
-							</view>
-							<text class="item-date">交易时间：{{ item.time | formatDate }}</text>
+	<view class="content">
+		<u-tabs class="tab" :list="tabs" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
+		<scroll-view scroll-y="true" class="scroll-Y">
+			<view v-if="list.length" class="list-wrap">
+				<view class="item-wrap" v-for="(item,index) in list" :key="index" @click="detail(item)">
+					<view class="item-left">
+						<text class="item-name">{{item.model}}</text>
+						<view class="item-info">
+							<text style="margin-right: 10rpx;">{{item.color}}</text>
+							<text>{{ item.version }}</text>
 						</view>
-						<view class="item-right">
-							<text class="item-stat">{{ item.stat}}</text>
-							<view class="item-price-wrap">
-								<text>成交价：</text>
-								<text class="item-price">¥ {{ item.prices }}</text>
-							</view>
+						<text class="item-date">交易时间：{{ item.time | formatDate }}</text>
+					</view>
+					<view class="item-right">
+						<text class="item-stat">{{ item.stat}}</text>
+						<view class="item-price-wrap">
+							<text>成交价：</text>
+							<text class="item-price">¥ {{ item.prices }}</text>
 						</view>
 					</view>
 				</view>
-				<u-empty v-else></u-empty>
-			</scroll-view>
-
-			<movable-area>
-				<movable-view direction="all" y="100" @click="godown">立即出货</movable-view>
-			</movable-area>
-		</view>
-
-		<view class="to-login" v-else>
-			<u-button style="width: 400rpx;" @click="toLogin" type="primary">去登录</u-button>
-		</view>
+			</view>
+			<u-empty v-else></u-empty>
+		</scroll-view>
 	</view>
-
 </template>
 
 <script>
@@ -42,7 +32,8 @@
 	export default {
 		data() {
 			return {
-				isLogin: true,
+				tabs: [{ name: '已收货' }, { name: '待收货' }],
+				currentType: 0,
 				list: [{
 					id: 1,
 					model: 'iphone 15 pro max',
@@ -72,21 +63,17 @@
 		},
 		onLoad() {},
 		mounted() {
-			this.isLogin = uni.getStorageSync('token')
+
 		},
 		methods: {
-			// 去登录
-			toLogin() {
-				uni.reLaunch({ url: '/pages/login/login' })
-			},
-			// 立即出货
-			godown() {
-				uni.navigateTo({ url: '/pages/sale/sale?type=1' })
-			},
 			// 查看详情
 			detail({ id }) {
 				console.log('查看详情', id)
-				uni.navigateTo({ url: `/pages/sale/sale?id=${id}&type=1` })
+				uni.navigateTo({ url: `/pages/sale/sale?id=${id}&type=2` })
+			},
+			change(index) {
+				this.currentType = index
+
 			}
 		},
 		filters: {
@@ -134,14 +121,6 @@
 		align-items: center;
 		width: 100%;
 		height: calc(100vh - 100px);
-	}
-
-	.to-login {
-		width: 100vw;
-		height: 100vh;
-		display: flex;
-		justify-content: center;
-		align-items: center;
 	}
 
 	.tab {

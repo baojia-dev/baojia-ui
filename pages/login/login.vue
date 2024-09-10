@@ -9,13 +9,11 @@
 			</u-form-item>
 			<u-form-item class="field-label" label="密码" prop="password" left-icon="lock" label-width="160"
 				@click-right-icon="switchPassType=!switchPassType">
-				<u-input v-model="registerForm.password" placeholder="密码"
-					:type="switchPassType ? 'password' : 'text'" />
+				<u-input v-model="registerForm.password" placeholder="密码" :type="switchPassType ? 'password' : 'text'" />
 			</u-form-item>
 			<u-form-item class="field-label" label="确认密码" prop="againPassword" left-icon="lock" label-width="160"
 				@click-right-icon="switchPassType=!switchPassType">
-				<u-input v-model="registerForm.againPassword" placeholder="确认密码"
-					:type="switchPassType ? 'password' : 'text'" />
+				<u-input v-model="registerForm.againPassword" placeholder="确认密码" :type="switchPassType ? 'password' : 'text'" />
 			</u-form-item>
 			<u-button shape="circle" class="u-m-t-20 u-m-b-20" type="primary" @click="handleRegister"
 				:loading="registerLoading">注册</u-button>
@@ -31,8 +29,7 @@
 				<u-input v-model="loginForm.password" placeholder="密码" :type="switchPassType ? 'password' : 'text'" />
 			</u-form-item>
 
-			<u-button class="login-btn" type="primary" text="登录" shape="circle" @click="handlelogin"
-				:loading="loginLoading">
+			<u-button class="login-btn" type="primary" text="登录" shape="circle" @click="handlelogin" :loading="loginLoading">
 				登录
 			</u-button>
 			<view class="tips" @click="isLogin = !isLogin">没有账号？去注册</view>
@@ -43,7 +40,7 @@
 </template>
 
 <script>
-	import * as api from '@/api/auth';
+	import * as api from '@/api/auth'
 	export default {
 		data() {
 			return {
@@ -90,12 +87,14 @@
 				}
 			}
 		},
-		computed: {
-
-		},
+		computed: {},
 		onReady() {
-			this.$refs.registerFormRef.setRules(this.rules);
-			this.$refs.loginFormRef.setRules(this.rules);
+			const isLogin = uni.getStorageSync('token')
+			if (isLogin) {
+				uni.switchTab({ url: '/pages/index/index' })
+			}
+			this.$refs.registerFormRef.setRules(this.rules)
+			this.$refs.loginFormRef.setRules(this.rules)
 		},
 		onLoad() {
 
@@ -109,50 +108,48 @@
 			},
 			// 注册
 			handleRegister() {
-				console.log("zhuce---")
+				console.log('zhuce---')
 				this.$refs.registerFormRef.validate(valid => {
-					console.log("zhuce---22", valid)
+					console.log('zhuce---22', valid)
 					if (valid) {
 						this.isLogin = true
 						this.registerLoading = true
 						setTimeout(() => {
 							this.registerLoading = false
-							this.showToast("注册成功", "success");
+							this.showToast('注册成功', 'success')
 						}, 1000)
 					} else {
-						console.log('验证失败');
+						console.log('验证失败')
 					}
-				});
+				})
 
 			},
 
 			// 登录
 			handlelogin() {
-				this.$refs.loginFormRef.validate(async (valid) => {
+				this.$refs.loginFormRef.validate(async valid => {
 					if (valid) {
 						this.loginLoading = true
 						try {
 							const res = await api.login(this.loginForm.username, this.loginForm.password)
-							uni.setStorageSync("token", res.data);
-							this.showToast("登录成功", "success");
+							uni.setStorageSync('token', res.data)
+							this.showToast('登录成功', 'success')
 							setTimeout(() => {
-								uni.switchTab({
-									url: '/pages/index/index'
-								})
+								uni.switchTab({ url: '/pages/index/index' })
 							}, 1000)
 						} catch (err) {
-							console.log(111,err)
-							this.showToast("登录失败" + err, "error");
+							console.log(111, err)
+							this.showToast('登录失败' + err, 'error')
 						} finally {
 							this.loginLoading = false
 						}
 					} else {
-						console.log('验证失败');
+						console.log('验证失败')
 					}
-				});
+				})
 			}
 		}
-	};
+	}
 </script>
 
 <style lang="scss" scoped>
