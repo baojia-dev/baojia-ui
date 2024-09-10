@@ -17,7 +17,7 @@
 						<text :class="item.status === 0 ? 'item-stat-red' : 'item-stat-green'" >{{ item.status | formatStatus }}</text>
 						<view class="item-price-wrap" v-show="item.status === 1">
 							<text>成交价：</text>
-							<text class="item-price">¥ {{ item.prices }}</text>
+							<text class="item-price">¥ {{ item.price }}</text>
 						</view>
 					</view>
 				</view>
