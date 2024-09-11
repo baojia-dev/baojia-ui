@@ -25,7 +25,7 @@
 
 		<view class="u-m-t-20">
 			<u-cell-group>
-				<u-cell-item icon="zhuanfa" title="退出登录"></u-cell-item>
+				<u-cell-item icon="zhuanfa" title="退出登录" @click="logout"></u-cell-item>
 			</u-cell-group>
 		</view>
 	</view>
@@ -42,10 +42,13 @@
 			}
 		},
 		onLoad() {
-			api.getUserInfo().then(res => {
-				this.userInfo = res.data
-				uni.setStorageSync('userInfo', JSON.stringify(res.data))
-			})
+			const isLogin = uni.getStorageSync('token')
+			if (isLogin) {
+				api.getUserInfo().then(res => {
+					this.userInfo = res.data
+					uni.setStorageSync('userInfo', JSON.stringify(res.data))
+				})
+			}
 		},
 		methods: {
 			toPrice() {
@@ -53,6 +56,11 @@
 			},
 			toSale() {
 				uni.navigateTo({ url: '/pages/takeGoods/takeGoods', })
+			},
+			// 退出登录
+			logout() {
+				uni.reLaunch({ url: "/pages/login/login" })
+				uni.clearStorageSync()
 			}
 		}
 	}

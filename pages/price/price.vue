@@ -3,7 +3,7 @@
 	<view class="content">
 		<u-tabs class="tab" :list="tabs" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
 		<scroll-view scroll-y="true" class="scroll-Y">
-			<view class="list-wrap">
+			<view v-if="list.length" class="list-wrap">
 				<view class="brand-tags">
 					<view class="brand-item" v-for="(item, index) in brands" :key="index">
 						<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" :name="index"
@@ -25,15 +25,13 @@
 					<view class="item-right">
 						<view class="input-wrap">
 							<view class="input-label">出货价：</view>
-							<u-input v-model="getNewestPrice(item).out_price" type="text" :border="true"
-								border-color="#2979ff" height="60" :custom-style="inputStyle" placeholder=''
-								@blur="handleOutPrice($event, item)" />
+							<u-input v-model="getNewestPrice(item).out_price" type="text" :border="true" border-color="#2979ff"
+								height="60" :custom-style="inputStyle" placeholder='' @blur="handleOutPrice($event, item)" />
 						</view>
 						<view class="input-wrap">
 							<view class="input-label">利润：</view>
-							<u-input v-model="getNewestPrice(item).profit" type="text" :border="true"
-								border-color="#2979ff" height="60" :custom-style="inputStyle" placeholder=''
-								@blur="handleNewestPrice($event, item)" />
+							<u-input v-model="getNewestPrice(item).profit" type="text" :border="true" border-color="#2979ff"
+								height="60" :custom-style="inputStyle" placeholder='' @blur="handleNewestPrice($event, item)" />
 						</view>
 						<view class="input-wrap">
 							<view class="input-label">收货价：</view>
@@ -43,7 +41,7 @@
 					</view>
 				</view>
 			</view>
-			<u-empty></u-empty>
+			<u-empty v-else></u-empty>
 		</scroll-view>
 	</view>
 </template>
@@ -53,18 +51,10 @@
 	export default {
 		data() {
 			return {
-				tabs: [{
-					name: '手机'
-				}, {
-					name: '平板'
-				}, {
-					name: '耳机'
-				}],
+				tabs: [{ name: '手机' }, { name: '平板' }, { name: '耳机' }],
 				currentType: 0,
 				currentBrand: '苹果',
-				inputStyle: {
-					fontSize: '36rpx',
-				},
+				inputStyle: { fontSize: '36rpx', },
 				list: [],
 				brands: [{
 						brand: '苹果',
@@ -83,15 +73,13 @@
 		mounted() {
 			this.getProducts()
 		},
-		computed: {
-
-		},
+		computed: {},
 		methods: {
 			handleBrandClick(brand) {
-				this.brands.map((item) => {
+				this.brands.map(item => {
 					item.checked = item.brand === brand ? true : false
 				})
-				this.currentBrand = brand;
+				this.currentBrand = brand
 				this.getProducts()
 			},
 			handleOutPrice(v, item) {
@@ -153,8 +141,8 @@
 				return today
 			},
 			change(index) {
-				this.currentType = index;
-				console.log("切换", this.currentType)
+				this.currentType = index
+				console.log('切换', this.currentType)
 				const type = this.currentType + 1
 				api.getProducts(type, '').then(res => {
 					this.list = res.data
@@ -163,7 +151,7 @@
 		},
 		filters: {
 			formatDate(value) {
-				const date = new Date(value.replace(/\-/g, "/"))
+				const date = new Date(value.replace(/\-/g, '/'))
 				const month = date.getMonth() + 1
 				const day = date.getDate()
 				return `${month}-${day}`

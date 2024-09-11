@@ -15,7 +15,8 @@
 							<text class="item-date">期望取货时间：{{ item.receive_time }}</text>
 						</view>
 						<view class="item-right">
-							<text :class="item.status === 0 ? 'item-stat-red' : 'item-stat-green'" >{{ item.status | formatStatus }}</text>
+							<text
+								:class="item.status === 0 ? 'item-stat-red' : 'item-stat-green'">{{ item.status | formatStatus }}</text>
 							<view class="item-price-wrap" v-show="item.status === 1">
 								<text>成交价：</text>
 								<text class="item-price">¥ {{ item.price }}</text>
@@ -45,42 +46,36 @@
 			return {
 				isLogin: true,
 				list: [],
-				tabs: [{ name: '待收货' },{ name: '已收货' }],
+				tabs: [{ name: '待收货' }, { name: '已收货' }],
 				currentType: 0,
 			}
 		},
 		onShow() {
-			this.getSales()
+			this.isLogin = uni.getStorageSync('token')
+			if (this.isLogin) {
+				this.getSales()
+			}
 		},
 		mounted() {
-			this.isLogin = uni.getStorageSync('token')
-			this.getSales()
+
 		},
 		methods: {
 			// 去登录
 			toLogin() {
-				uni.reLaunch({
-					url: '/pages/login/login'
-				})
+				uni.reLaunch({ url: '/pages/login/login' })
 			},
 			// 立即出货
 			godown() {
-				uni.navigateTo({
-					url: '/pages/sale/sale?type=1'
-				})
+				uni.navigateTo({ url: '/pages/sale/sale?type=1' })
 			},
 			change(index) {
 				this.currentType = index
 				this.getSales()
 			},
 			// 查看详情
-			detail({
-				id
-			}) {
+			detail({ id }) {
 				console.log('查看详情', id)
-				uni.navigateTo({
-					url: `/pages/saleDetail/saleDetail?id=${id}&type=1`
-				})
+				uni.navigateTo({ url: `/pages/saleDetail/saleDetail?id=${id}&type=1` })
 			},
 			getSales() {
 				api.getSales(this.currentType).then(res => {
@@ -92,7 +87,7 @@
 		filters: {
 			// 2024-10-10 => 10-10
 			formatDate(value) {
-				const date = new Date(value.replace(/\-/g, "/"))
+				const date = new Date(value.replace(/\-/g, '/'))
 				const year = date.getFullYear()
 				const month = date.getMonth() + 1
 				const day = date.getDate()
@@ -211,7 +206,7 @@
 		background-color: #fef0f0;
 		font-size: 28rpx;
 	}
-	
+
 	.item-stat-green {
 		padding: 2rpx 10rpx;
 		color: #0BB20C;
