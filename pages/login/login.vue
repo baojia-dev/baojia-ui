@@ -9,11 +9,13 @@
 			</u-form-item>
 			<u-form-item class="field-label" label="密码" prop="password" left-icon="lock" label-width="160"
 				@click-right-icon="switchPassType=!switchPassType">
-				<u-input v-model="registerForm.password" placeholder="密码" :type="switchPassType ? 'password' : 'text'" />
+				<u-input v-model="registerForm.password" placeholder="密码"
+					:type="switchPassType ? 'password' : 'text'" />
 			</u-form-item>
 			<u-form-item class="field-label" label="确认密码" prop="againPassword" left-icon="lock" label-width="160"
 				@click-right-icon="switchPassType=!switchPassType">
-				<u-input v-model="registerForm.againPassword" placeholder="确认密码" :type="switchPassType ? 'password' : 'text'" />
+				<u-input v-model="registerForm.againPassword" placeholder="确认密码"
+					:type="switchPassType ? 'password' : 'text'" />
 			</u-form-item>
 			<u-button shape="circle" class="u-m-t-20 u-m-b-20" type="primary" @click="handleRegister"
 				:loading="registerLoading">注册</u-button>
@@ -29,7 +31,8 @@
 				<u-input v-model="loginForm.password" placeholder="密码" :type="switchPassType ? 'password' : 'text'" />
 			</u-form-item>
 
-			<u-button class="login-btn" type="primary" text="登录" shape="circle" @click="handlelogin" :loading="loginLoading">
+			<u-button class="login-btn" type="primary" text="登录" shape="circle" @click="handlelogin"
+				:loading="loginLoading">
 				登录
 			</u-button>
 			<view class="tips" @click="isLogin = !isLogin">没有账号？去注册</view>
@@ -91,7 +94,9 @@
 		onReady() {
 			const isLogin = uni.getStorageSync('token')
 			if (isLogin) {
-				uni.switchTab({ url: '/pages/index/index' })
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			}
 			this.$refs.registerFormRef.setRules(this.rules)
 			this.$refs.loginFormRef.setRules(this.rules)
@@ -112,12 +117,24 @@
 				this.$refs.registerFormRef.validate(valid => {
 					console.log('zhuce---22', valid)
 					if (valid) {
-						this.isLogin = true
 						this.registerLoading = true
-						setTimeout(() => {
+						api.register(this.registerForm.username, this.registerForm.password).then(res => {
+							if (res.code === 0) {
+								this.showToast('注册成功', 'success')
+								this.registerForm = {
+									username: '',
+									password: '',
+									againPassword: ''
+								}
+								this.registerLoading = false
+								this.isLogin = true
+							} else {
+								console.log('注册失败')
+							}
+						}).finally(() => {
 							this.registerLoading = false
-							this.showToast('注册成功', 'success')
-						}, 1000)
+						})
+
 					} else {
 						console.log('验证失败')
 					}
@@ -135,7 +152,9 @@
 							uni.setStorageSync('token', res.data)
 							this.showToast('登录成功', 'success')
 							setTimeout(() => {
-								uni.switchTab({ url: '/pages/index/index' })
+								uni.switchTab({
+									url: '/pages/index/index'
+								})
 							}, 1000)
 						} catch (err) {
 							console.log(111, err)

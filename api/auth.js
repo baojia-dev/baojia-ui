@@ -11,6 +11,17 @@ export const login = (username, password) => {
 	})
 }
 
+export const register = (username, password) => {
+	return request({
+		url: '/register',
+		method: 'POST',
+		data: {
+			username,
+			password
+		}
+	})
+}
+
 export const logout = () => {
 	return request({
 		url: '/logout',

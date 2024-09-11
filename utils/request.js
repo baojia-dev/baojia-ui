@@ -19,7 +19,7 @@ let request = http => {
 			},
 			// withCredentials: true,
 			success: res => { //请求成功
-				if (res.statusCode === 200 && res.data.code === 0) { //这里后台返回一个自定义状态码，可根据实际开发情况调整
+				if ((res.statusCode === 200 || res.statusCode === 201) && res.data.code === 0) { //这里后台返回一个自定义状态码，可根据实际开发情况调整
 					resolve(res.data)
 				} else {
 					if (res.data.code == 401) {

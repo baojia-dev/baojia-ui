@@ -26,7 +26,7 @@
 
 		<view class="u-m-t-20">
 			<u-cell-group>
-				<u-cell-item icon="zhuanfa" title="退出登录"></u-cell-item>
+				<u-cell-item icon="zhuanfa" title="退出登录" @click="handleLogout"></u-cell-item>
 			</u-cell-group>
 		</view>
 	</view>
@@ -49,6 +49,20 @@
 			})
 		},
 		methods: {
+			handleLogout() {
+				uni.showModal({
+					title: '提示',
+					content: '确定要退出登录吗？',
+					success: (res) => {
+						if (res.confirm) {
+							uni.clearStorageSync()
+							uni.reLaunch({
+								url: '/pages/login/login'
+							})
+						}
+					}
+				})
+			},
 			toPrice() {
 				uni.navigateTo({
 					url: '/pages/price/price',

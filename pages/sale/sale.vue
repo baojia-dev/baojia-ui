@@ -121,15 +121,7 @@
 				},
 				productTypes: [],
 				productType: '手机', // 单选值
-				brands: [{
-					name: '苹果',
-					checked: true,
-					disabled: false
-				}, {
-					name: '华为',
-					checked: false,
-					disabled: false
-				}],
+				brands: [],
 				brand: '苹果',
 				selectShow: false,
 				pickerShow: false, // 时间选择器是否显示
@@ -158,6 +150,7 @@
 		async mounted() {
 			await this.getProductTypes()
 			await this.getProducts()
+			await this.getBrands()
 		},
 		computed: {},
 		onReady() {
@@ -220,7 +213,7 @@
 				}
 			},
 			// 选择品牌
-			brandChange(e) {
+			 brandChange(e) {
 				this.brand = e
 				this.getProducts()
 			},
@@ -228,6 +221,7 @@
 			radioGroupChange(e) {
 				this.model.type = e
 				this.getProducts()
+				this.getBrands()
 			},
 			// 选择产品名称回调
 			selectConfirm(e) {
@@ -247,6 +241,20 @@
 					hour
 				} = e
 				this.model.receive_time = `${year}-${month}-${day} ${hour}`
+			},
+			async getBrands() {
+				const type = this.productTypes.find(item => item.name === this.productType).id
+				const res = await api.getBrands(type)
+				this.brands = res.data.map(item => {
+					return {
+						name: item,
+						checked: false
+					}
+				})
+				if (this.brands.length > 0) {
+					this.brands[0].checked = true
+					this.currentBrand = this.brands[0].name
+				}
 			},
 			// 获取产品列表
 			async getProducts() {
