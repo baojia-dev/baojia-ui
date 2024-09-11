@@ -90,7 +90,7 @@
 					out_price: parseFloat(v),
 					profit: profit,
 					// 收货价 = 出货价 - 利润
-					// in_price: parseFloat(v) - parseFloat(profit),
+					in_price: parseFloat(v) - parseFloat(profit),
 					created_at: this.getTodayDate()
 				}
 				api.updatePrice(update).then(res => {
