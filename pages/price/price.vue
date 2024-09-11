@@ -1,15 +1,15 @@
 <template>
 	<!-- 首页 -->
 	<view class="content">
-		<u-tabs class="tab" :list="tabs" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
+		<u-tabs class="tab" :list="productTypes" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
+		<view class="brand-tags">
+			<view class="brand-item" v-for="(item, index) in brands" :key="index">
+				<u-tag :text="item.brand" type="primary" shape="circle" :mode="item.checked ? 'dark' : 'plain'" :name="index"
+					@click="handleBrandClick(item.brand)"></u-tag>
+			</view>
+		</view>
 		<scroll-view scroll-y="true" class="scroll-Y">
-			<view v-if="list.length" class="list-wrap">
-				<view class="brand-tags">
-					<view class="brand-item" v-for="(item, index) in brands" :key="index">
-						<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" :name="index"
-							@click="handleBrandClick(item.brand)"></u-tag>
-					</view>
-				</view>
+			<view class="list-wrap">
 				<view class="item-wrap" v-for="(item,index) in list" :key="index">
 					<view class="item-left">
 						<view class="item-brand">
@@ -25,13 +25,15 @@
 					<view class="item-right">
 						<view class="input-wrap">
 							<view class="input-label">出货价：</view>
-							<u-input v-model="getNewestPrice(item).out_price" type="text" :border="true" border-color="#2979ff"
-								height="60" :custom-style="inputStyle" placeholder='' @blur="handleOutPrice($event, item)" />
+							<u-input v-model="getNewestPrice(item).out_price" type="text" :border="true"
+								border-color="#2979ff" height="60" :custom-style="inputStyle" placeholder=''
+								@blur="handleOutPrice($event, item)" />
 						</view>
 						<view class="input-wrap">
 							<view class="input-label">利润：</view>
-							<u-input v-model="getNewestPrice(item).profit" type="text" :border="true" border-color="#2979ff"
-								height="60" :custom-style="inputStyle" placeholder='' @blur="handleNewestPrice($event, item)" />
+							<u-input v-model="getNewestPrice(item).profit" type="text" :border="true"
+								border-color="#2979ff" height="60" :custom-style="inputStyle" placeholder=''
+								@blur="handleNewestPrice($event, item)" />
 						</view>
 						<view class="input-wrap">
 							<view class="input-label">收货价：</view>
@@ -41,7 +43,7 @@
 					</view>
 				</view>
 			</view>
-			<u-empty v-else></u-empty>
+			<u-empty></u-empty>
 		</scroll-view>
 	</view>
 </template>
@@ -51,35 +53,33 @@
 	export default {
 		data() {
 			return {
-				tabs: [{ name: '手机' }, { name: '平板' }, { name: '耳机' }],
+				productTypes: [],
 				currentType: 0,
 				currentBrand: '苹果',
-				inputStyle: { fontSize: '36rpx', },
+				inputStyle: {
+					fontSize: '36rpx',
+				},
 				list: [],
-				brands: [{
-						brand: '苹果',
-						checked: true
-					},
-					{
-						brand: '华为',
-						checked: false
-					},
-				]
+				brands: []
 			}
 		},
 		onLoad() {
 
 		},
-		mounted() {
-			this.getProducts()
+		async mounted() {
+			await this.getProductTypes()
+			await this.getBrands()
+			await this.getProducts()
 		},
-		computed: {},
+		computed: {
+
+		},
 		methods: {
 			handleBrandClick(brand) {
-				this.brands.map(item => {
+				this.brands.map((item) => {
 					item.checked = item.brand === brand ? true : false
 				})
-				this.currentBrand = brand
+				this.currentBrand = brand;
 				this.getProducts()
 			},
 			handleOutPrice(v, item) {
@@ -120,11 +120,25 @@
 				}
 				return {}
 			},
-			getProducts() {
-				const type = this.currentType + 1
-				api.getProducts(type, this.currentBrand).then(res => {
-					this.list = res.data
+			async getProductTypes() {
+				const res = await api.getProductTypes()
+				this.productTypes = res.data
+			},
+			async getBrands() {
+				const res = await api.getBrands(this.currentType+1)
+				this.brands = res.data.map(item => {
+					return {
+						brand: item,
+						checked: false
+					}
 				})
+				this.brands[0].checked = true
+				this.currentBrand = this.brands[0].brand
+			},
+			async getProducts() {
+				const type = this.currentType + 1
+				const res = await api.getProducts(type, this.currentBrand)
+				this.list = res.data
 			},
 			getDateFontStyle(date) {
 				return {
@@ -141,8 +155,8 @@
 				return today
 			},
 			change(index) {
-				this.currentType = index
-				console.log('切换', this.currentType)
+				this.currentType = index;
+				console.log("切换", this.currentType)
 				const type = this.currentType + 1
 				api.getProducts(type, '').then(res => {
 					this.list = res.data
@@ -151,7 +165,8 @@
 		},
 		filters: {
 			formatDate(value) {
-				const date = new Date(value.replace(/\-/g, '/'))
+				if (!value) return ''
+				const date = new Date(value.replace(/\-/g, "/"))
 				const month = date.getMonth() + 1
 				const day = date.getDate()
 				return `${month}-${day}`
@@ -261,13 +276,14 @@
 	}
 
 	.brand-item {
-		margin-right: 40rpx;
+		margin-right: 20rpx;
 	}
-
+	
 	.brand-tags {
 		display: flex;
 		width: 100%;
 		height: 100%;
-		margin-bottom: 20rpx;
+		margin-top: 20rpx;
+		padding: 0 20rpx;
 	}
 </style>

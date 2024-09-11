@@ -1,12 +1,14 @@
 <template>
 	<view class="wrap">
 		<u-form :model="model" :rules="rules" ref="uForm" :errorType="['message']">
-			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="联系方式" prop="contact" label-width="150">
+			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="联系方式" prop="contact"
+				label-width="150">
 				<u-input :border="false" placeholder="请输入手机号或微信号" v-model="model.contact" type="text"
 					:disabled="disabled"></u-input>
 			</u-form-item>
 			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="序列号" prop="sn" label-width="150">
-				<u-input :border="false" placeholder="请输入序列号" v-model="model.sn" type="text" :disabled="disabled"></u-input>
+				<u-input :border="false" placeholder="请输入序列号" v-model="model.sn" type="text"
+					:disabled="disabled"></u-input>
 			</u-form-item>
 			<u-form-item label="取货地址" prop="address" label-width="150">
 				<u-input type="text" :border="false" placeholder="请填写取货地址(地铁站点)" v-model="model.address"
@@ -17,10 +19,10 @@
 					v-model="model.receive_time" @click="pickerShow = true" :disabled="disabled"></u-input>
 				<view class="input-wrap" @click="pickerShow = true"></view>
 			</u-form-item>
-			<u-form-item label="商品类型" prop="type" label-width="150">
-				<u-radio-group v-model="radio" @change="radioGroupChange" :width="radioCheckWidth" :wrap="radioCheckWrap"
-					:disabled="disabled">
-					<u-radio shape="circle" v-for="(item, index) in radioList" :key="index" :name="item.name">
+			<u-form-item label="产品类型" prop="type" label-width="150">
+				<u-radio-group v-model="productType" @change="radioGroupChange" :width="radioCheckWidth"
+					:wrap="radioCheckWrap" :disabled="disabled">
+					<u-radio shape="circle" v-for="(item, index) in productTypes" :key="item.id" :name="item.name">
 						{{ item.name }}
 					</u-radio>
 				</u-radio-group>
@@ -82,10 +84,6 @@
 				disabled: false, // 表单禁用
 				// 产品型号列表
 				products: [],
-				typeMap: {
-					'手机': 1,
-					'平板': 2,
-				},
 				// 表单校验规则
 				rules: {
 					name: [{
@@ -121,23 +119,8 @@
 						trigger: 'change',
 					}],
 				},
-				radioList: [{
-						name: '手机',
-						checked: true,
-						disabled: false
-					},
-					{
-						name: '平板',
-						checked: false,
-						disabled: false
-					},
-					{
-						name: '耳机',
-						checked: false,
-						disabled: false
-					},
-				],
-				radio: '手机', // 单选值
+				productTypes: [],
+				productType: '手机', // 单选值
 				brands: [{
 					name: '苹果',
 					checked: true,
@@ -172,8 +155,9 @@
 			// this.pageType = +options.type
 			// console.log('收货？出货', options)
 		},
-		mounted() {
-			this.getProducts()
+		async mounted() {
+			await this.getProductTypes()
+			await this.getProducts()
 		},
 		computed: {},
 		onReady() {
@@ -189,14 +173,17 @@
 						console.log(this.model)
 						api.createSale({
 							...this.model,
-							type: this.typeMap[this.radio],
+							// 根据name找id
+							type: this.productTypes.find(item => item.name === this.model.type).id,
 							product_id: this.currentModel
 						}).then(res => {
 							if (res.code === 0) {
 								this.$u.toast('提交成功')
 								// this.model = {}
 								setTimeout(() => {
-									uni.navigateBack({ delta: 1 })
+									uni.navigateBack({
+										delta: 1
+									})
 								}, 1000)
 							} else {
 								this.$u.toast(res.msg)
@@ -262,18 +249,26 @@
 				this.model.receive_time = `${year}-${month}-${day} ${hour}`
 			},
 			// 获取产品列表
-			getProducts() {
-				const type = this.typeMap[this.radio]
-				api.getProducts(type, this.brand).then(res => {
-					this.products = res.data.map(item => {
-						return {
-							label: `${item.model}-${item.color}-${item.version}`,
-							value: item.id
-						}
-					})
+			async getProducts() {
+				const type = this.productTypes.find(item => item.name === this.productType).id
+				const res = await api.getProducts(type, this.brand)
+				this.products = res.data.map(item => {
+					return {
+						label: `${item.model}-${item.color}-${item.version}`,
+						value: item.id
+					}
 				})
 			},
-
+			async getProductTypes() {
+				const res = await api.getProductTypes()
+				this.productTypes = res.data.map(item => {
+					return {
+						name: item.name,
+						checked: false,
+						id: item.id
+					}
+				})
+			},
 		}
 	}
 </script>

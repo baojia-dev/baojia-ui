@@ -17,6 +17,7 @@
 
 		<view class="u-m-t-20">
 			<u-cell-group>
+				<u-cell-item v-if="userInfo.is_admin" icon="tags" title="产品维护" @click="toProduct"></u-cell-item>
 				<u-cell-item v-if="userInfo.is_admin" icon="order" title="价格维护" @click="toPrice"></u-cell-item>
 				<u-cell-item v-if="userInfo.is_admin" icon="bell" title="收货列表" @click="toSale"></u-cell-item>
 				<!-- <u-cell-item icon="kefu-ermai" title="联系我们"></u-cell-item> -->
@@ -25,7 +26,7 @@
 
 		<view class="u-m-t-20">
 			<u-cell-group>
-				<u-cell-item icon="zhuanfa" title="退出登录" @click="logout"></u-cell-item>
+				<u-cell-item icon="zhuanfa" title="退出登录"></u-cell-item>
 			</u-cell-group>
 		</view>
 	</view>
@@ -42,25 +43,26 @@
 			}
 		},
 		onLoad() {
-			const isLogin = uni.getStorageSync('token')
-			if (isLogin) {
-				api.getUserInfo().then(res => {
-					this.userInfo = res.data
-					uni.setStorageSync('userInfo', JSON.stringify(res.data))
-				})
-			}
+			api.getUserInfo().then(res => {
+				this.userInfo = res.data
+				uni.setStorageSync('userInfo', JSON.stringify(res.data))
+			})
 		},
 		methods: {
 			toPrice() {
-				uni.navigateTo({ url: '/pages/price/price', })
+				uni.navigateTo({
+					url: '/pages/price/price',
+				})
 			},
 			toSale() {
-				uni.navigateTo({ url: '/pages/takeGoods/takeGoods', })
+				uni.navigateTo({
+					url: '/pages/takeGoods/takeGoods',
+				})
 			},
-			// 退出登录
-			logout() {
-				uni.reLaunch({ url: "/pages/login/login" })
-				uni.clearStorageSync()
+			toProduct() {
+				uni.navigateTo({
+					url: '/pages/product/product',
+				})
 			}
 		}
 	}

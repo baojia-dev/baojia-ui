@@ -7,6 +7,14 @@ export const getProducts = (type, brand) => {
 	})
 }
 
+export const addProduct = (data) => {
+	return request({
+		url: `/product`,
+		method: 'POST',
+		data,
+	})
+}
+
 export const updatePrice = (data) => {
 	return request({
 		url: `/price`,
@@ -42,5 +50,19 @@ export const confirmSale = (data) => {
 		url: `/sale/confirm`,
 		method: 'PUT',
 		data,
+	})
+}
+
+export const getBrands = (type) => {
+	return request({
+		url: `/brands?type=${type}`,
+		method: 'GET',
+	})
+}
+
+export const getProductTypes = () => {
+	return request({
+		url: `/product/types`,
+		method: 'GET',
 	})
 }

@@ -47,7 +47,6 @@
 
 		<u-button v-if="pageType === 2 && saleInfo.status === 0" @click="confirmShow = true" type="primary">确认收货</u-button>
 
-
 		<u-modal v-model="confirmShow" title="" ref="model" @confirm="confirmSale" :async-close="true" show-cancel-button>
 			<u-form :model="confirmForm" ref="uForm" :label-width="150" style="margin: 20rpx;">
 				<u-form-item label="成交价格" required>

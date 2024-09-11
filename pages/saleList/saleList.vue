@@ -87,6 +87,7 @@
 		filters: {
 			// 2024-10-10 => 10-10
 			formatDate(value) {
+				if (!value) return ''
 				const date = new Date(value.replace(/\-/g, '/'))
 				const year = date.getFullYear()
 				const month = date.getMonth() + 1

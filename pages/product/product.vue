@@ -4,28 +4,37 @@
 		<u-tabs class="tab" :list="productTypes" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
 		<view class="brand-tags">
 			<view class="brand-item" v-for="(item, index) in brands" :key="index">
-				<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" shape="circle" :name="index"
+				<u-tag :text="item.brand" type="primary" shape="circle" :mode="item.checked ? 'dark' : 'plain'" :name="index"
 					@click="handleBrandClick(item.brand)"></u-tag>
 			</view>
 		</view>
 		<scroll-view scroll-y="true" class="scroll-Y">
 			<view v-if="list.length" class="list-wrap">
 				<view class="item-wrap" v-for="(item,index) in list" :key="index">
-					<view class="item-left">
+					<view class="item-top">
 						<text class="item-name">{{item.model}}</text>
-						<view class="item-info">
-							<text style="margin-right: 10rpx;">{{item.color}}</text>
-							<text>{{ item.version }}</text>
-						</view>
 					</view>
-					<view class="item-right">
-						<text class="item-date">{{ getNewestPrice(item).created_at | formatDate }}</text>
-						<text class="item-price">¥ {{ getNewestPrice(item).in_price }}</text>
+					<view class="item-bottom">
+						<view>
+							<u-tag style="margin-right: 10rpx; margin-bottom: 10rpx;" v-for="(item, index) in groupByColor(item.items)"
+								:key="index" :text="item" />
+						</view>
+
+						<view style="margin-top: 20rpx; margin-bottom:20rpx;">
+							<u-tag style="margin-right: 10rpx; margin-bottom: 10rpx;" type="success"
+								v-for="(item, index) in groupByVersion(item.items)" :key="index" :text="item" />
+						</view>
 					</view>
 				</view>
 			</view>
 			<u-empty v-else></u-empty>
 		</scroll-view>
+
+		<movable-area>
+			<movable-view direction="all" y="120" x="20" @click="handleAdd()">
+				<u-icon name="plus" size="40"></u-icon>
+			</movable-view>
+		</movable-area>
 	</view>
 </template>
 
@@ -55,17 +64,16 @@
 				this.currentBrand = brand;
 				this.getProducts()
 			},
+			handleAdd() {
+				uni.navigateTo({
+					url: '/pages/addProduct/addProduct'
+				})
+			},
 			async change(index) {
 				this.currentType = index;
 				console.log("切换", this.currentType)
 				await this.getBrands()
 				await this.getProducts()
-			},
-			getNewestPrice(item) {
-				if (item.prices && item.prices.length > 0) {
-					return item.prices[0]
-				}
-				return {}
 			},
 			async getProductTypes() {
 				const res = await api.getProductTypes()
@@ -87,16 +95,27 @@
 			async getProducts() {
 				const type = this.currentType + 1
 				const res = await api.getProducts(type, this.currentBrand)
-				this.list = res.data
+				// 按照 res.data[i].model 分组[{"model": "xxx", items: []}]
+				const grouped = res.data.reduce((acc, item) => {
+					const model = item.model
+					if (!acc[model]) {
+						acc[model] = {
+							model: model,
+							items: []
+						}
+					}
+					acc[model].items.push(item)
+					return acc
+				}, {})
+				this.list = Object.values(grouped)
 			},
-			getTodayDate() {
-				const now = new Date()
-				const year = now.getFullYear()
-				const month = now.getMonth() + 1
-				const day = now.getDate()
-				const today = `${year}-${month}-${day}`
-				return today
+			groupByColor(item) {
+				console.log(item)
+				return [...new Set(item.map(item2 => item2.color))]
 			},
+			groupByVersion(item) {
+				return [...new Set(item.map(item2 => item2.version))]
+			}
 		},
 		filters: {
 			// 2024-10-10 => 10-10
@@ -138,21 +157,24 @@
 	}
 
 	.item-wrap {
-		height: 120rpx;
+		height: auto;
 		margin-bottom: 20rpx;
 		background-color: #fff;
 		display: flex;
 		justify-content: space-between;
+		flex-direction: column;
 		align-items: center;
 		border-radius: 16rpx;
 	}
 
-	.item-left {
-		height: 100%;
-		padding: 25rpx;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
+	.item-top {
+		width: 100%;
+		padding: 20rpx;
+	}
+
+	.item-bottom {
+		width: 100%;
+		padding: 0rpx 20rpx;
 	}
 
 	.item-name {
@@ -162,33 +184,13 @@
 		font-weight: 600;
 	}
 
-	.item-info {
-		color: #999;
-		font-size: 24rpx;
-		line-height: 24rpx;
-	}
-
-	.item-right {
-		height: 100%;
-		// position: relative;
+	.item-color-wrap {
 		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 0rpx 15rpx;
-	}
-
-	.item-date {
-		padding: 2rpx 10rpx;
-		color: #FA3534;
-		background-color: #fef0f0;
-		font-size: 28rpx;
-		margin-right: 40rpx;
-	}
-
-	.item-price {
-		width: 150rpx;
-		color: $u-type-primary;
-		font-size: 38rpx;
+		flex-wrap: wrap;
+		width: 100%;
+		height: 100%;
+		margin-top: 20rpx;
+		padding: 0 20rpx;
 	}
 
 	.brand-item {
@@ -198,8 +200,27 @@
 	.brand-tags {
 		display: flex;
 		width: 100%;
-		height: 100%;
 		margin-top: 20rpx;
 		padding: 0 20rpx;
+	}
+
+	movable-area {
+		width: 160rpx;
+		height: 400rpx;
+		position: absolute;
+		right: 0rpx;
+		bottom: 0rpx;
+	}
+
+	movable-view {
+		width: 100rpx;
+		height: 100rpx;
+		color: #fff;
+		font-size: 28rpx;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: $u-type-primary;
 	}
 </style>
