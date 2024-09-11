@@ -26,16 +26,13 @@
 				{{ saleInfo.remark }}
 			</u-cell-item>
 			<u-cell-item title="订单截图" :arrow="false" center @click="preview(ossUrl + saleInfo.order_img)">
-				<u-image style="float: right;" width="200rpx" height="200rpx"
-					:src="ossUrl + saleInfo.order_img"></u-image>
+				<u-image style="float: right;" width="200rpx" height="200rpx" :src="ossUrl + saleInfo.order_img"></u-image>
 			</u-cell-item>
 			<u-cell-item title="包装正面截图" :arrow="false" center @click="preview(ossUrl + saleInfo.pkg_front_img)">
-				<u-image style="float: right;" width="200rpx" height="200rpx"
-					:src="ossUrl + saleInfo.pkg_front_img"></u-image>
+				<u-image style="float: right;" width="200rpx" height="200rpx" :src="ossUrl + saleInfo.pkg_front_img"></u-image>
 			</u-cell-item>
 			<u-cell-item title="包装背面截图" :arrow="false" center @click="preview(ossUrl + saleInfo.pkg_back_img)">
-				<u-image style="float: right;" width="200rpx" height="200rpx"
-					:src="ossUrl + saleInfo.pkg_back_img"></u-image>
+				<u-image style="float: right;" width="200rpx" height="200rpx" :src="ossUrl + saleInfo.pkg_back_img"></u-image>
 			</u-cell-item>
 			<u-cell-item v-show="saleInfo.status === 1" title="成交价" :arrow="false">
 				{{ saleInfo.price }}
@@ -48,19 +45,17 @@
 			</u-cell-item>
 		</u-cell-group>
 
-		<u-button v-if="pageType === 2 && saleInfo.status === 0" @click="confirmShow = true"
-			type="primary">确认收货</u-button>
+		<u-button v-if="pageType === 2 && saleInfo.status === 0" @click="confirmShow = true" type="primary">确认收货</u-button>
 
 
-		<u-modal v-model="confirmShow" title="" @confirm="confirmSale" :async-close="true" show-cancel-button>
+		<u-modal v-model="confirmShow" title="" ref="model" @confirm="confirmSale" :async-close="true" show-cancel-button>
 			<u-form :model="confirmForm" ref="uForm" :label-width="150" style="margin: 20rpx;">
 				<u-form-item label="成交价格" required>
 					<u-input v-model="confirmForm.price" type="number" />
 				</u-form-item>
 				<u-form-item label="结算方式">
 					<u-radio-group v-model="confirmForm.payment">
-						<u-radio v-for="(item, index) in paymentTypes" :key="index" :name="item.name"
-							:disabled="item.disabled">
+						<u-radio v-for="(item, index) in paymentTypes" :key="index" :name="item.name" :disabled="item.disabled">
 							{{ item.name }}
 						</u-radio>
 					</u-radio-group>
@@ -84,16 +79,12 @@
 					price: '',
 					payment: '微信'
 				},
-				paymentTypes: [{
-						name: '微信',
-					},
+				paymentTypes: [{ name: '微信', },
 					{
 						name: '支付宝',
 						checked: false,
 					},
-					{
-						name: '银行卡',
-					}
+					{ name: '银行卡', }
 				]
 			}
 		},
@@ -103,16 +94,12 @@
 				this.getSaleInfo(options.id)
 			}
 			this.pageType = +options.type
-			uni.setNavigationBarTitle({
-				title: this.pageType === 1 ? '出货详情' : '收货详情'
-			})
+			uni.setNavigationBarTitle({ title: this.pageType === 1 ? '出货详情' : '收货详情' })
 			console.log('收货？出货', options)
 		},
 		methods: {
 			preview(url) {
-				uni.previewImage({
-					urls: [url]
-				})
+				uni.previewImage({ urls: [url] })
 			},
 			// 获取出货详情
 			getSaleInfo(id) {
@@ -131,10 +118,9 @@
 				}
 				console.log(this.confirmForm)
 				if (!this.confirmForm.price) {
-					uni.showToast({
-						title: '请输入成交价格'
-					})
+					this.$u.toast('请输入成交价格')
 					this.confirmShow = true
+					this.$refs.model.clearLoading()
 					return
 				}
 				api.confirmSale({
@@ -143,14 +129,10 @@
 					id: this.saleInfo.id
 				}).then(res => {
 					console.log(res)
-					uni.showToast({
-						title: '收货成功'
-					})
+					this.$u.toast('收货成功')
 					this.confirmShow = false
 					setTimeout(() => {
-						uni.navigateBack({
-							delta: 1
-						})
+						uni.navigateBack({ delta: 1 })
 					}, 1000)
 				})
 			}

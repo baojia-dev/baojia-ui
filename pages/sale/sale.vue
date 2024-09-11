@@ -1,14 +1,12 @@
 <template>
 	<view class="wrap">
 		<u-form :model="model" :rules="rules" ref="uForm" :errorType="['message']">
-			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="联系方式" prop="contact"
-				label-width="150">
+			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="联系方式" prop="contact" label-width="150">
 				<u-input :border="false" placeholder="请输入手机号或微信号" v-model="model.contact" type="text"
 					:disabled="disabled"></u-input>
 			</u-form-item>
 			<u-form-item :rightIconStyle="{color: '#888', fontSize: '32rpx'}" label="序列号" prop="sn" label-width="150">
-				<u-input :border="false" placeholder="请输入序列号" v-model="model.sn" type="text"
-					:disabled="disabled"></u-input>
+				<u-input :border="false" placeholder="请输入序列号" v-model="model.sn" type="text" :disabled="disabled"></u-input>
 			</u-form-item>
 			<u-form-item label="取货地址" prop="address" label-width="150">
 				<u-input type="text" :border="false" placeholder="请填写取货地址(地铁站点)" v-model="model.address"
@@ -17,10 +15,11 @@
 			<u-form-item label="取货时间" prop="receive_time" label-width="180">
 				<u-input :border="false" type="select" :select-open="pickerShow" placeholder="请选择取货时间"
 					v-model="model.receive_time" @click="pickerShow = true" :disabled="disabled"></u-input>
+				<view class="input-wrap" @click="pickerShow = true"></view>
 			</u-form-item>
 			<u-form-item label="商品类型" prop="type" label-width="150">
-				<u-radio-group v-model="radio" @change="radioGroupChange" :width="radioCheckWidth"
-					:wrap="radioCheckWrap" :disabled="disabled">
+				<u-radio-group v-model="radio" @change="radioGroupChange" :width="radioCheckWidth" :wrap="radioCheckWrap"
+					:disabled="disabled">
 					<u-radio shape="circle" v-for="(item, index) in radioList" :key="index" :name="item.name">
 						{{ item.name }}
 					</u-radio>
@@ -37,6 +36,7 @@
 			<u-form-item label="产品型号" prop="product_id" label-width="150">
 				<u-input :border="false" type="select" :select-open="selectShow" v-model="model.product_id"
 					placeholder="请选择产品型号" @click="selectShow = true" :disabled="disabled"></u-input>
+				<view class="input-wrap" @click="selectShow = true"></view>
 			</u-form-item>
 			<u-form-item label="备注" prop="remark" label-width="150">
 				<u-input type="text" :border="false" placeholder="请填写备注" v-model="model.remark" :disabled="disabled" />
@@ -67,7 +67,7 @@
 		data() {
 			let that = this
 			return {
-				action: uni.getStorageSync('baseUrl') + "/upload",
+				action: uni.getStorageSync('baseUrl') + '/upload',
 				model: {
 					contact: '', // 联系方式
 					sn: '', // 序列号
@@ -196,9 +196,7 @@
 								this.$u.toast('提交成功')
 								// this.model = {}
 								setTimeout(() => {
-									uni.navigateBack({
-										delta: 1
-									})
+									uni.navigateBack({ delta: 1 })
 								}, 1000)
 							} else {
 								this.$u.toast(res.msg)
@@ -275,7 +273,7 @@
 					})
 				})
 			},
-			
+
 		}
 	}
 </script>
@@ -291,5 +289,13 @@
 		align-items: center;
 		border-top: 1px solid #eee;
 		padding: 30rpx 0 0 0;
+	}
+
+	.input-wrap {
+		height: 100rpx;
+		width: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
 	}
 </style>
