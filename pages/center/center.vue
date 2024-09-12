@@ -43,13 +43,15 @@
 				userInfo: {}
 			}
 		},
-		onLoad() {
-			api.getUserInfo().then(res => {
-				this.userInfo = res.data
-				uni.setStorageSync('userInfo', JSON.stringify(res.data))
-			})
+		onShow() {
+			this.getUserInfo()
 		},
 		methods: {
+			getUserInfo() {
+				api.getUserInfo().then(res => {
+					this.userInfo = res.data
+				})
+			},
 			handleLogout() {
 				uni.showModal({
 					title: '提示',
