@@ -1,205 +1,113 @@
 <template>
-	<!-- 首页 -->
-	<view class="content">
-		<u-tabs class="tab" :list="productTypes" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
-		<view class="brand-tags">
-			<view class="brand-item" v-for="(item, index) in brands" :key="index">
-				<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" shape="circle" :name="index"
-					@click="handleBrandClick(item.brand)"></u-tag>
-			</view>
-		</view>
+	<view class="article-container">
 		<scroll-view scroll-y="true" class="scroll-Y">
-			<view v-if="list.length" class="list-wrap">
-				<view class="item-wrap" v-for="(item,index) in list" :key="index">
-					<view class="item-left">
-						<text class="item-name">{{item.model}}</text>
-						<view class="item-info">
-							<text style="margin-right: 10rpx;">{{item.color}}</text>
-							<text>{{ item.version }}</text>
-						</view>
-					</view>
-					<view class="item-right">
-						<text class="item-date">{{ getNewestPrice(item).created_at | formatDate }}</text>
-						<text class="item-price">¥ {{ getNewestPrice(item).in_price }}</text>
-					</view>
+			<view v-for="(item,index) in list" :key="index" class="article-item" @click="toDetail(item.id)">
+				<view class="article-item-left" v-show="item.cover">
+					<image :src="item.cover" mode="aspectFill" class="article-cover"></image>
+				</view>
+				<view class="article-item-right">
+					<view class="article-title">{{ item.title }}</view>
+					<view class="article-text">{{ item.created_at | formatDatetTime}}</view>
 				</view>
 			</view>
-			<u-empty v-else></u-empty>
 		</scroll-view>
 	</view>
 </template>
 
 <script>
-	import * as api from '@/api/product.js'
+	import * as api from '@/api/article.js'
 	export default {
+		components: {},
 		data() {
 			return {
-				productTypes: [],
-				currentType: 0,
-				currentBrand: '苹果',
-				list: [],
-				brands: []
-			}
+				list: []
+			};
 		},
 		onLoad() {},
-		async mounted() {
-			await this.getProductTypes()
-			await this.getBrands()
-			await this.getProducts()
+		onShow() {
+			this.getArticles()
 		},
 		methods: {
-			handleBrandClick(brand) {
-				this.brands.map((item) => {
-					item.checked = item.brand === brand ? true : false
+			// handleAdd() {
+			// 	uni.navigateTo({
+			// 		url: '/pages/addArticle/addArticle'
+			// 	})
+			// }
+			toDetail(id) {
+				uni.navigateTo({
+					url: `/pages/articleDetail/articleDetail?id=${id}`
 				})
-				this.currentBrand = brand;
-				this.getProducts()
 			},
-			async change(index) {
-				this.currentType = index;
-				console.log("切换", this.currentType)
-				await this.getBrands()
-				await this.getProducts()
-			},
-			getNewestPrice(item) {
-				if (item.prices && item.prices.length > 0) {
-					return item.prices[0]
-				}
-				return {}
-			},
-			async getProductTypes() {
-				const res = await api.getProductTypes()
-				this.productTypes = res.data
-			},
-			async getBrands() {
-				const res = await api.getBrands(this.currentType + 1)
-				this.brands = res.data.map(item => {
-					return {
-						brand: item,
-						checked: false
-					}
+			getArticles() {
+				api.getArticles().then(res => {
+					console.log(res)
+					this.list = res.data
 				})
-				if (this.brands.length > 0) {
-					this.brands[0].checked = true
-					this.currentBrand = this.brands[0].brand
-				}
-			},
-			async getProducts() {
-				const type = this.currentType + 1
-				const res = await api.getProducts(type, this.currentBrand)
-				this.list = res.data
-			},
-			getTodayDate() {
-				const now = new Date()
-				const year = now.getFullYear()
-				const month = now.getMonth() + 1
-				const day = now.getDate()
-				const today = `${year}-${month}-${day}`
-				return today
-			},
+			}
 		},
 		filters: {
-			// 2024-10-10 => 10-10
-			formatDate(value) {
+			// 2024-09-12T14:04:53.661874+08:00 => 2024-09-12 14:04:53
+			formatDatetTime(value) {
 				if (!value) return ''
-				const date = new Date(value.replace(/\-/g, "/"))
+				const date = new Date(value)
 				const year = date.getFullYear()
 				const month = date.getMonth() + 1
 				const day = date.getDate()
-				return `${month}-${day}`
+				const hour = date.getHours()
+				const minute = date.getMinutes()
+				const second = date.getSeconds()
+				return `${year}-${month}-${day} ${hour}:${minute}:${second}`
 			}
 		}
-	}
+
+	};
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	page {
-		background-color: #f2f2f2;
+		background-color: $u-bg-color;
 	}
 
-	.content {
+	.article-container {
+		padding: 20rpx;
+	}
+
+	.article-item {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		width: 100%;
-		height: calc(100vh - 100px);
-	}
-
-	.tab {
-		width: 100%;
-	}
-
-	.scroll-Y {
-		height: calc(100vh - 150px);
-	}
-
-	.list-wrap {
-		padding: 20rpx 20rpx 50rpx 20rpx;
-	}
-
-	.item-wrap {
-		height: 120rpx;
 		margin-bottom: 20rpx;
 		background-color: #fff;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		border-radius: 16rpx;
+		padding: 20rpx;
+		border-radius: 10rpx;
 	}
-
-	.item-left {
-		height: 100%;
-		padding: 25rpx;
+	
+	.article-item-left {
+		width: 120rpx;
+		margin-right: 60rpx;
+		padding-left: 20rpx;
+	}
+	
+	.article-cover {
+		width: 100%;
+		height: 120rpx;
+		border-radius: 10rpx;
+	}
+	
+	.article-item-right {
+		flex: 1;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
 	}
 
-	.item-name {
-		color: #323232;
+	.article-title {
+		font-size: 36rpx;
+		font-weight: bold;
+		margin-bottom: 10rpx;
+	}
+
+	.article-text {
 		font-size: 28rpx;
-		line-height: 28rpx;
-		font-weight: 600;
-	}
-
-	.item-info {
-		color: #999;
-		font-size: 24rpx;
-		line-height: 24rpx;
-	}
-
-	.item-right {
-		height: 100%;
-		// position: relative;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 0rpx 15rpx;
-	}
-
-	.item-date {
-		padding: 2rpx 10rpx;
-		color: #FA3534;
-		background-color: #fef0f0;
-		font-size: 28rpx;
-		margin-right: 40rpx;
-	}
-
-	.item-price {
-		width: 150rpx;
-		color: $u-type-primary;
-		font-size: 38rpx;
-	}
-
-	.brand-item {
-		margin-right: 20rpx;
-	}
-
-	.brand-tags {
-		display: flex;
-		width: 100%;
-		height: 100%;
-		margin-top: 20rpx;
-		padding: 0 20rpx;
+		color: #666;
+		margin-top: 10rpx;
 	}
 </style>

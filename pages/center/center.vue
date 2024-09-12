@@ -19,7 +19,8 @@
 			<u-cell-group>
 				<u-cell-item v-if="userInfo.is_admin" icon="tags" title="产品维护" @click="toProduct"></u-cell-item>
 				<u-cell-item v-if="userInfo.is_admin" icon="order" title="价格维护" @click="toPrice"></u-cell-item>
-				<u-cell-item v-if="userInfo.is_admin" icon="bell" title="收货列表" @click="toSale"></u-cell-item>
+				<u-cell-item v-if="userInfo.is_admin" icon="bag" title="收货列表" @click="toSale"></u-cell-item>
+				<u-cell-item v-if="userInfo.is_admin" icon="bell" title="添加资讯" @click="toArticle"></u-cell-item>
 				<!-- <u-cell-item icon="kefu-ermai" title="联系我们"></u-cell-item> -->
 			</u-cell-group>
 		</view>
@@ -76,6 +77,11 @@
 			toProduct() {
 				uni.navigateTo({
 					url: '/pages/product/product',
+				})
+			},
+			toArticle() {
+				uni.navigateTo({
+					url: '/pages/addArticle/addArticle',
 				})
 			}
 		}

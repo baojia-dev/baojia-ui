@@ -5,9 +5,16 @@
 	"pages": [{
 			"path": "pages/index/index",
 			"style": {
+				"navigationBarTitleText": "资讯"
+			}
+		},
+		{
+			"path": "pages/quote/quote",
+			"style": {
 				"navigationBarTitleText": "报价"
 			}
-		}, {
+		},
+		{
 			"path": "pages/login/login",
 			"style": {
 				"navigationBarTitleText": "登录",
@@ -41,35 +48,44 @@
 
 		},
 		{
-			"path" : "pages/takeGoods/takeGoods",
-			"style" : 
-			{
-				"navigationBarTitleText" : "",
-				"enablePullDownRefresh" : false
+			"path": "pages/takeGoods/takeGoods",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
 			}
 		},
 		{
-			"path" : "pages/saleDetail/saleDetail",
+			"path": "pages/saleDetail/saleDetail",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/product/product",
+			"style": {
+				"navigationBarTitleText": "产品维护"
+			}
+		},
+		{
+			"path": "pages/addProduct/addProduct",
+			"style": {
+				"navigationBarTitleText": "新增产品"
+			}
+		},
+		{
+			"path" : "pages/addArticle/addArticle",
 			"style" : 
 			{
 				"navigationBarTitleText" : ""
 			}
 		},
 		{
-			"path" : "pages/product/product",
+			"path" : "pages/articleDetail/articleDetail",
 			"style" : 
 			{
-				"navigationBarTitleText" : "产品维护"
-			}
-		},
-		{
-			"path" : "pages/addProduct/addProduct",
-			"style" : 
-			{
-				"navigationBarTitleText" : "新增产品"
+				"navigationBarTitleText" : "资讯详情"
 			}
 		}
-
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
@@ -83,20 +99,27 @@
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
-			"pagePath": "pages/index/index",
-			"iconPath": "static/img/index.png",
-			"selectedIconPath": "static/img/index-selected.png",
-			"text": "报价"
-		}, {
-			"pagePath": "pages/saleList/saleList",
-			"iconPath": "static/img/index.png",
-			"selectedIconPath": "static/img/index-selected.png",
-			"text": "出货"
-		}, {
-			"pagePath": "pages/center/center",
-			"iconPath": "static/img/center.png",
-			"selectedIconPath": "static/img/center-selected.png",
-			"text": "个人中心"
-		}]
+				"pagePath": "pages/index/index",
+				"iconPath": "static/img/index.png",
+				"selectedIconPath": "static/img/index-selected.png",
+				"text": "资讯"
+			},
+			{
+				"pagePath": "pages/quote/quote",
+				"iconPath": "static/img/price.png",
+				"selectedIconPath": "static/img/price-selected.png",
+				"text": "报价"
+			}, {
+				"pagePath": "pages/saleList/saleList",
+				"iconPath": "static/img/goods.png",
+				"selectedIconPath": "static/img/goods-selected.png",
+				"text": "出货"
+			}, {
+				"pagePath": "pages/center/center",
+				"iconPath": "static/img/center.png",
+				"selectedIconPath": "static/img/center-selected.png",
+				"text": "个人中心"
+			}
+		]
 	}
 }

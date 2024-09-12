@@ -1,6 +1,5 @@
-// const baseUrl = process.env.NODE_ENV === 'development' ? 'https://bj.xbmlz.cc/api' : 'https://bj.xbmlz.cc/api'
-const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:8080/api' : 'https://bj.xbmlz.cc/api'
-uni.setStorageSync('baseUrl', baseUrl)
+
+
 let request = http => {
 	const {
 		url,
@@ -10,7 +9,7 @@ let request = http => {
 	const token = uni.getStorageSync('token')
 	return new Promise((resolve, reject) => {
 		uni.request({
-			url: baseUrl + url,
+			url: uni.getStorageSync('baseUrl') + url,
 			method,
 			data,
 			header: {

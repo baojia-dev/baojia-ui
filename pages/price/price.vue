@@ -4,8 +4,8 @@
 		<u-tabs class="tab" :list="productTypes" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
 		<view class="brand-tags">
 			<view class="brand-item" v-for="(item, index) in brands" :key="index">
-				<u-tag :text="item.brand" type="primary" shape="circle" :mode="item.checked ? 'dark' : 'plain'" :name="index"
-					@click="handleBrandClick(item.brand)"></u-tag>
+				<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" shape="circle"
+					:name="index" @click="handleBrandClick(item.brand)"></u-tag>
 			</view>
 		</view>
 		<scroll-view scroll-y="true" class="scroll-Y">
@@ -27,24 +27,23 @@
 							<view class="input-label">出货价：</view>
 							<u-input v-model="getNewestPrice(item).out_price" type="text" :border="true"
 								border-color="#2979ff" height="60" :custom-style="inputStyle" placeholder=''
-								@blur="handleOutPrice($event, item)" />
+								@blur="handleOutPrice($event, item, index)" />
 						</view>
 						<view class="input-wrap">
 							<view class="input-label">利润：</view>
 							<u-input v-model="getNewestPrice(item).profit" type="text" :border="true"
 								border-color="#2979ff" height="60" :custom-style="inputStyle" placeholder=''
-								@blur="handleNewestPrice($event, item)" />
+								@blur="handleNewestPrice($event, item, index)" />
 						</view>
 						<view class="input-wrap">
 							<view class="input-label">收货价：</view>
 							<text class="item-price">¥ {{ getNewestPrice(item).in_price }}</text>
 						</view>
-
 					</view>
 				</view>
 			</view>
-			<u-empty></u-empty>
 		</scroll-view>
+		<u-empty v-if="!list"></u-empty>
 	</view>
 </template>
 
@@ -82,36 +81,50 @@
 				this.currentBrand = brand;
 				this.getProducts()
 			},
-			handleOutPrice(v, item) {
+			handleOutPrice(v, item, index) {
 				console.log('handleOutPrice', v, item)
 				const profit = this.getNewestPrice(item).profit
+				const in_price = parseFloat(v) - parseFloat(profit)
 				const update = {
 					product_id: item.id,
 					out_price: parseFloat(v),
 					profit: profit,
 					// 收货价 = 出货价 - 利润
-					in_price: parseFloat(v) - parseFloat(profit),
+					in_price,
 					created_at: this.getTodayDate()
 				}
+				let priceObj = item.prices[0]
+				priceObj.in_price = in_price
+				this.$set(this.list, index, {
+					...item,
+					prices: [priceObj]
+				})
 				api.updatePrice(update).then(res => {
 					console.log(res)
-					this.getProducts()
+					// this.getProducts()
 				})
 			},
-			handleNewestPrice(v, item) {
+			handleNewestPrice(v, item, index) {
 				console.log('handleNewestPrice', v, item)
 				const out_price = this.getNewestPrice(item).out_price
+				const in_price = parseFloat(out_price) - parseFloat(v)
 				const update = {
 					product_id: item.id,
 					out_price: parseFloat(out_price),
 					profit: parseFloat(v),
 					// 收货价 = 出货价 - 利润
-					// in_price: parseFloat(out_price) - parseFloat(v),
+					in_price,
 					created_at: this.getTodayDate()
 				}
+				let priceObj = item.prices[0]
+				priceObj.in_price = in_price
+				this.$set(this.list, index, {
+					...item,
+					prices: [priceObj]
+				})
 				api.updatePrice(update).then(res => {
 					console.log(res)
-					this.getProducts()
+					// this.getProducts()
 				})
 			},
 			getNewestPrice(item) {
@@ -125,15 +138,17 @@
 				this.productTypes = res.data
 			},
 			async getBrands() {
-				const res = await api.getBrands(this.currentType+1)
+				const res = await api.getBrands(this.currentType + 1)
 				this.brands = res.data.map(item => {
 					return {
 						brand: item,
 						checked: false
 					}
 				})
-				this.brands[0].checked = true
-				this.currentBrand = this.brands[0].brand
+				if (this.brands.length > 0) {
+					this.brands[0].checked = true
+					this.currentBrand = this.brands[0].brand
+				}
 			},
 			async getProducts() {
 				const type = this.currentType + 1
@@ -154,13 +169,11 @@
 				const today = `${year}-${month}-${day}`
 				return today
 			},
-			change(index) {
+			async change(index) {
 				this.currentType = index;
 				console.log("切换", this.currentType)
-				const type = this.currentType + 1
-				api.getProducts(type, '').then(res => {
-					this.list = res.data
-				})
+				await this.getBrands()
+				await this.getProducts()
 			}
 		},
 		filters: {
@@ -278,7 +291,7 @@
 	.brand-item {
 		margin-right: 20rpx;
 	}
-	
+
 	.brand-tags {
 		display: flex;
 		width: 100%;

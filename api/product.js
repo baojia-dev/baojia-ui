@@ -17,7 +17,7 @@ export const addProduct = (data) => {
 
 export const updatePrice = (data) => {
 	return request({
-		url: `/price`,
+		url: `/product/price`,
 		method: 'POST',
 		data,
 	})
