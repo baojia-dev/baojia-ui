@@ -1,12 +1,16 @@
 <template>
 	<!-- 首页 -->
 	<view class="content">
+	
 		<u-tabs class="tab" :list="productTypes" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
 		<view class="brand-tags">
 			<view class="brand-item" v-for="(item, index) in brands" :key="index">
 				<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" shape="circle" :name="index"
 					@click="handleBrandClick(item.brand)"></u-tag>
 			</view>
+		</view>
+		<view class="search">
+			<u-search placeholder="请输入品牌/颜色/版本" @search="getProducts" :clearabled="true" :show-action="false" shape="round" v-model="keyword"></u-search>
 		</view>
 		<scroll-view scroll-y="true" class="scroll-Y">
 			<view v-if="list.length" class="list-wrap">
@@ -38,7 +42,8 @@
 				currentType: 0,
 				currentBrand: '苹果',
 				list: [],
-				brands: []
+				brands: [],
+				keyword: ''
 			}
 		},
 		onLoad() {},
@@ -86,7 +91,7 @@
 			},
 			async getProducts() {
 				const type = this.currentType + 1
-				const res = await api.getProducts(type, this.currentBrand)
+				const res = await api.getProducts(type, this.currentBrand, this.keyword)
 				this.list = res.data
 			},
 			getTodayDate() {
@@ -132,9 +137,31 @@
 	.scroll-Y {
 		height: calc(100vh - 150px);
 	}
+	
+	.search {
+		width: 100%;
+		height: 100px;
+		padding: 20rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background-color: #fff;
+	}
+
+	.search-input {
+		width: 100%;
+		height: 100%;
+		background-color: #f2f2f2;
+		border-radius: 16rpx;
+		padding: 0rpx 20rpx;
+	}
 
 	.list-wrap {
+		width: 100vw;
 		padding: 20rpx 20rpx 50rpx 20rpx;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(700rpx, 1fr));
+		gap: 10rpx;
 	}
 
 	.item-wrap {
@@ -192,14 +219,15 @@
 	}
 
 	.brand-item {
+		margin-top: 10rpx;
 		margin-right: 20rpx;
 	}
 
 	.brand-tags {
+		background-color: #fff;
 		display: flex;
 		width: 100%;
 		height: 100%;
-		margin-top: 20rpx;
 		padding: 0 20rpx;
 	}
 </style>

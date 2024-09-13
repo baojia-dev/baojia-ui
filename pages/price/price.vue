@@ -85,12 +85,13 @@
 				console.log('handleOutPrice', v, item)
 				const profit = this.getNewestPrice(item).profit
 				const in_price = parseFloat(v) - parseFloat(profit)
+				console.log(in_price)
 				const update = {
 					product_id: item.id,
 					out_price: parseFloat(v),
 					profit: profit,
 					// 收货价 = 出货价 - 利润
-					in_price,
+					in_price: in_price,
 					created_at: this.getTodayDate()
 				}
 				let priceObj = item.prices[0]
@@ -210,7 +211,11 @@
 	}
 
 	.list-wrap {
+		width: 100vw;
 		padding: 20rpx 20rpx 50rpx 20rpx;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(700rpx, 1fr));
+		gap: 20rpx;
 	}
 
 	.item-wrap {
