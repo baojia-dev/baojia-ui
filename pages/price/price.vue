@@ -83,7 +83,7 @@
 			},
 			handleOutPrice(v, item, index) {
 				console.log('handleOutPrice', v, item)
-				const profit = this.getNewestPrice(item).profit
+				const profit = this.getNewestPrice(item).profit || 0
 				const in_price = parseFloat(v) - parseFloat(profit)
 				console.log(in_price)
 				const update = {
@@ -94,7 +94,7 @@
 					in_price: in_price,
 					created_at: this.getTodayDate()
 				}
-				let priceObj = item.prices[0]
+				let priceObj = this.getNewestPrice(item)
 				priceObj.in_price = in_price
 				this.$set(this.list, index, {
 					...item,
@@ -107,7 +107,7 @@
 			},
 			handleNewestPrice(v, item, index) {
 				console.log('handleNewestPrice', v, item)
-				const out_price = this.getNewestPrice(item).out_price
+				const out_price = this.getNewestPrice(item).out_price || 0
 				const in_price = parseFloat(out_price) - parseFloat(v)
 				const update = {
 					product_id: item.id,
@@ -117,7 +117,7 @@
 					in_price,
 					created_at: this.getTodayDate()
 				}
-				let priceObj = item.prices[0]
+				let priceObj = this.getNewestPrice(item)
 				priceObj.in_price = in_price
 				this.$set(this.list, index, {
 					...item,

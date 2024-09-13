@@ -1,6 +1,6 @@
 import request from '@/utils/request.js'
 
-export const getProducts = (type, brand, keyword) => {
+export const getProducts = (type, brand, keyword = '') => {
 	return request({
 		url: `/products?type=${type}&brand=${brand}&search=${keyword}`,
 		method: 'GET',

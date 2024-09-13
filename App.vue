@@ -4,12 +4,9 @@
 			console.log('App Launch')
 			const pages = getCurrentPages(); // 获取当前页面栈
 			// const baseUrl = process.env.NODE_ENV === 'development' ? 'https://bj.xbmlz.cc/api' : 'https://bj.xbmlz.cc/api'
-			const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:8080/api' : 'https://bj.xbmlz.cc/api'
-			uni.setStorageSync('baseUrl', baseUrl)
 		},
 		onShow: function() {
 			console.log('App Show')
-
 		},
 		onHide: function() {
 			console.log('App Hide')
