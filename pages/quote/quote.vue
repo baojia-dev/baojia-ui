@@ -140,7 +140,7 @@
 	
 	.search {
 		width: 100%;
-		height: 100px;
+		height: 100rpx;
 		padding: 20rpx;
 		display: flex;
 		justify-content: space-between;
@@ -227,7 +227,6 @@
 		background-color: #fff;
 		display: flex;
 		width: 100%;
-		height: 100%;
 		padding: 0 20rpx;
 	}
 </style>
