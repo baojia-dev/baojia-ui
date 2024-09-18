@@ -1,15 +1,15 @@
 <template>
 	<!-- 首页 -->
 	<view class="content">
-	
+
 		<u-tabs class="tab" :list="productTypes" :is-scroll="false" :current="currentType" @change="change"></u-tabs>
 		<view class="brand-tags">
 			<view class="brand-item" v-for="(item, index) in brands" :key="index">
-				<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" shape="circle" :name="index"
-					@click="handleBrandClick(item.brand)"></u-tag>
+				<u-tag :text="item.brand" type="primary" :mode="item.checked ? 'dark' : 'plain'" shape="circle"
+					:name="index" @click="handleBrandClick(item.brand)"></u-tag>
 			</view>
 		</view>
-		<view class="search">
+		<!-- <view class="search">
 			<u-search placeholder="请输入品牌/颜色/版本" @search="getProducts" :clearabled="true" :show-action="false" shape="round" v-model="keyword"></u-search>
 		</view>
 		<scroll-view scroll-y="true" class="scroll-Y">
@@ -29,6 +29,25 @@
 				</view>
 			</view>
 			<u-empty v-else></u-empty>
+		</scroll-view> -->
+		<scroll-view scroll-y="true" class="scroll-Y">
+			<view v-for="(item, index) in models" :key="index">
+				<u-card :title="item.name" :sub-title="getUpdateTime(item.items)">
+					<view class="" slot="body">
+						<u-table>
+							<u-tr class="u-tr">
+								<u-th class="u-th">颜色/版本</u-th>
+								<u-th class="u-th" v-for="version in getVersions(item.items)" :key="version">{{version}}</u-th>
+							</u-tr>
+
+							<u-tr class="u-tr" v-for="t in getTableData(item.items)">
+								<u-td class="u-td">{{t.color}}</u-td>
+								<u-td class="u-td" v-for="(cell, index) in t.data" :key="index">{{cell ? cell : '-'}}</u-td>
+							</u-tr>
+						</u-table>
+					</view>
+				</u-card>
+			</view>
 		</scroll-view>
 	</view>
 </template>
@@ -43,7 +62,8 @@
 				currentBrand: '苹果',
 				list: [],
 				brands: [],
-				keyword: ''
+				keyword: '',
+				models: []
 			}
 		},
 		onLoad() {},
@@ -62,7 +82,6 @@
 			},
 			async change(index) {
 				this.currentType = index;
-				console.log("切换", this.currentType)
 				await this.getBrands()
 				await this.getProducts()
 			},
@@ -93,6 +112,35 @@
 				const type = this.currentType + 1
 				const res = await api.getProducts(type, this.currentBrand, this.keyword)
 				this.list = res.data
+				// 按照 model 分组为对象数组 [{name: xxx, items: []}]
+				this.models = [...new Set(res.data.map(item => item.model))].map(model => {
+					return {
+						name: model,
+						items: res.data.filter(item => item.model === model)
+					}
+				})
+			},
+			getUpdateTime(item) {
+				return this.getTodayDate()
+			},
+			getVersions(item) {
+				// 去除GB
+				return [...new Set(item.map(item => item.version))].map(version => {
+					return version.replaceAll('GB', '')
+				})
+			},
+			getTableData(item) {
+				const colors = [...new Set(item.map(item => item.color))]
+				const versions = [...new Set(item.map(item => item.version))]
+				return colors.map(color => {
+					return {
+						color: color,
+						data: versions.map(version => {
+							let foundItem = item.find(d => d.color === color && d.version === version);
+							return foundItem ? this.getNewestPrice(foundItem).in_price : '-';
+						})
+					};
+				});
 			},
 			getTodayDate() {
 				const now = new Date()
@@ -135,9 +183,9 @@
 	}
 
 	.scroll-Y {
-		height: calc(100vh - 150px);
+		height: calc(100vh - 360rpx);
 	}
-	
+
 	.search {
 		width: 100%;
 		height: 100rpx;
@@ -227,6 +275,6 @@
 		background-color: #fff;
 		display: flex;
 		width: 100%;
-		padding: 0 20rpx;
+		padding: 10rpx 20rpx;
 	}
 </style>

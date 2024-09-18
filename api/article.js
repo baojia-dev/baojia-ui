@@ -21,3 +21,18 @@ export const getArticle = (id) => {
 		method: 'GET',
 	})
 }
+
+export const updateArticle = (data) => {
+	return request({
+		url: `/article`,
+		method: 'PUT',
+		data,
+	})
+}
+
+export const deleteArticle = (id) => {
+	return request({
+		url: `/article/${id}`,
+		method: 'DELETE',
+	})
+}

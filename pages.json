@@ -3,17 +3,18 @@
 		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
 	},
 	"pages": [{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "资讯"
-			}
-		},
-		{
 			"path": "pages/quote/quote",
 			"style": {
 				"navigationBarTitleText": "报价"
 			}
 		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "资讯"
+			}
+		},
+
 		{
 			"path": "pages/login/login",
 			"style": {
@@ -73,17 +74,16 @@
 			}
 		},
 		{
-			"path" : "pages/addArticle/addArticle",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
+			"path": "pages/addArticle/addArticle",
+			"style": {
+				"navigationStyle": "custom", // 隐藏系统导航栏
+				"navigationBarTextStyle": "white" // 状态栏字体为白色，只能为 white-白色，black-黑色 二选一
 			}
 		},
 		{
-			"path" : "pages/articleDetail/articleDetail",
-			"style" : 
-			{
-				"navigationBarTitleText" : "资讯详情"
+			"path": "pages/articleDetail/articleDetail",
+			"style": {
+				"navigationBarTitleText": "资讯详情"
 			}
 		}
 	],
@@ -99,12 +99,6 @@
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
-				"pagePath": "pages/index/index",
-				"iconPath": "static/img/index.png",
-				"selectedIconPath": "static/img/index-selected.png",
-				"text": "资讯"
-			},
-			{
 				"pagePath": "pages/quote/quote",
 				"iconPath": "static/img/price.png",
 				"selectedIconPath": "static/img/price-selected.png",
@@ -114,6 +108,12 @@
 				"iconPath": "static/img/goods.png",
 				"selectedIconPath": "static/img/goods-selected.png",
 				"text": "出货"
+			},
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/img/index.png",
+				"selectedIconPath": "static/img/index-selected.png",
+				"text": "资讯"
 			}, {
 				"pagePath": "pages/center/center",
 				"iconPath": "static/img/center.png",

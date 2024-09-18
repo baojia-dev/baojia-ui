@@ -1,5 +1,11 @@
 <template>
 	<view class="container">
+		<u-navbar :title="navTitle" :background="{backgroundColor: '#2979ff'}" title-color="#fff"
+			back-icon-color="#fff">
+			<view slot="right" style="margin-right: 20rpx;">
+				<view style="cursor: pointer; color: #fff" @click="save">保存</view>
+			</view>
+		</u-navbar>
 		<view class="header">
 			<!-- <switch :checked="readOnly" @change="readOnly = !readOnly" /> -->
 			<u-form :model="form" ref="uForm" label-width="140">
@@ -10,10 +16,6 @@
 			<sp-editor editorId="editor" :toolbar-config="toolbarConfig" :readOnly="readOnly" @input="inputOver"
 				@upinImage="upinImage" @upinVideo="upinVideo" @init="initEditor" @overMax="overMax"
 				@exportHtml="exportHtml" @addLink="addLink"></sp-editor>
-		</view>
-
-		<view class="footer">
-			<u-button type="primary" @click="save">提交</u-button>
 		</view>
 	</view>
 </template>
@@ -35,7 +37,7 @@
 					iconColumns: 10
 				},
 				mediaQueryOb: null, // 响应式媒体查询，
-
+				navTitle: '新增资讯',
 				form: {
 					title: '',
 					html: '',
@@ -45,12 +47,10 @@
 		},
 		onLoad(option) {
 			this.id = option.id
-			uni.setNavigationBarTitle({
-				title: this.id ? '编辑文章' : '新增文章'
-			})
-			// if (this.id) {
-			// 	this.getDetail()
-			// }
+			this.navTitle = this.id ? '编辑资讯' : '新增资讯'
+			if (this.id) {
+				this.getDetail()
+			}
 		},
 		mounted() {
 			this.testMediaQueryObserver()
@@ -58,9 +58,16 @@
 		destroyed() {
 			this.mediaQueryOb.disconnect() //组件销毁时停止媒体查询监听
 			this.mediaQueryOb = null
-			console.log('==== destroyed :')
 		},
 		methods: {
+			getDetail() {
+				api.getArticle(this.id).then(res => {
+					console.log('==== getDetail :', res)
+					this.form.text = res.data.text
+					this.form.html = res.data.html
+					this.form.title = res.data.title
+				})
+			},
 			/**
 			 * 媒体查询 - 响应式处理一些东西
 			 */
@@ -109,18 +116,17 @@
 			},
 			preRender() {
 				// 初始化编辑器内容
-				// uni.showLoading({
-				//   title: '数据加载中...'
-				// })
-				// setTimeout(() => {
-				//   const htmlContent = `<div><strong>猫猫</strong> <a href="http://www.baidu.com">百度</a>\n<img style="width:100px;height:50px;" src="https://img.yzcdn.cn/vant/cat.jpeg"  />\n<i>yaho</i> giao\n<img width="200px" src="https://img.yzcdn.cn/vant/cat.jpeg"/></div>\n`
-				//   const handleHtml = convertImgStylesToAttributes(htmlContent)
-				//   console.log(handleHtml);
-				//   this.editorIns.setContents({
-				//     html: handleHtml
-				//   })
-				//   uni.hideLoading()
-				// }, 1000)
+				uni.showLoading({
+					title: '数据加载中...'
+				})
+				setTimeout(() => {
+					const handleHtml = convertImgStylesToAttributes(this.form.html)
+					console.log(handleHtml);
+					this.editorIns.setContents({
+						html: handleHtml
+					})
+					uni.hideLoading()
+				}, 500)
 				// setTimeout(() => {
 				//   /**
 				//    * 光标默认在第一个，所以默认会在最前面插入内容
@@ -171,7 +177,7 @@
 				tempFiles.forEach((item) => {
 					console.log(item);
 					const baseUrl = uni.getStorageSync('baseUrl')
-					const token =  uni.getStorageSync('token')
+					const token = uni.getStorageSync('token')
 					uni.uploadFile({
 						url: baseUrl + '/upload',
 						filePath: item.path,
@@ -205,7 +211,7 @@
 				// 此处tempFilePath为本地视频临时地址，请对接后端接口将视频上传后，获取真实地址，再插入到编辑器中
 				// 上传视频，并获取视频真实地址（其实和上面插入图片的步骤差不多）
 				const baseUrl = uni.getStorageSync('baseUrl')
-				const token =  uni.getStorageSync('token')
+				const token = uni.getStorageSync('token')
 				uni.uploadFile({
 					url: baseUrl + '/upload',
 					filePath: tempFilePath.path,
@@ -233,7 +239,7 @@
 						console.error('文件上传失败', error);
 					}
 				});
-				
+
 			},
 			/**
 			 * 导出
@@ -259,25 +265,65 @@
 				console.log('==== addLink :', e)
 			},
 			save() {
-				api.saveArticle(this.form).then(res => {
-					console.log(res)
-					if (res.code === 0) {
-						uni.showToast({
+				if (!this.form.title) {
+					uni.showToast({
+						title: '请输入标题',
+						icon: 'none',
+						duration: 1000
+					})
+					return
+				}
+				if (!this.form.content) {
+					uni.showToast({
+						title: '请输入内容',
+						icon: 'none',
+						duration: 1000
+					})
+				}
+				if (this.id) {
+					api.updateArticle({
+						id: parseInt(this.id),
+						...this.form
+					}).then(res => {
+						console.log(res)
+						if (res.code === 0) {
+							uni.showToast({
 								title: '保存成功',
 								icon: 'success',
 								duration: 2000
 							})
-						uni.switchTab({
-							url: '/pages/index/index'
-						})
-					} else {
-						uni.showToast({
-							title: '保存失败',
-							icon: 'none',
-							duration: 2000
-						})
-					}
-				})
+							uni.switchTab({
+								url: '/pages/index/index'
+							})
+						} else {
+							uni.showToast({
+								title: '保存失败',
+								icon: 'none',
+								duration: 2000
+							})
+						}
+					})
+				} else {
+					api.saveArticle(this.form).then(res => {
+						console.log(res)
+						if (res.code === 0) {
+							uni.showToast({
+								title: '保存成功',
+								icon: 'success',
+								duration: 2000
+							})
+							uni.switchTab({
+								url: '/pages/index/index'
+							})
+						} else {
+							uni.showToast({
+								title: '保存失败',
+								icon: 'none',
+								duration: 2000
+							})
+						}
+					})
+				}
 			}
 		}
 	}
